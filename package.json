@@ -1,0 +1,43 @@
+{
+  "name": "events-manager",
+  "version": "1.0.0",
+  "description": "Events Manager",
+  "scripts": {
+    "generate:keys:dev": "cp services-config/app.prod.json services-config/app.json && cp services-config/app.web.prod.json services-config/app.web.json",
+    "generate:keys:test": "cp services-config/app.test.json services-config/app.json && cp services-config/app.web.test.json services-config/app.web.json",
+    "start": "npm run generate:keys:dev && node index.js",
+    "test": "npm run generate:keys:test && nyc --reporter=lcov ava",
+    "watch:test": "ava --watch",
+    "lint": "npx eslint .eslintrc.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "engines": {
+    "node": "8"
+  },
+  "private": true,
+  "devDependencies": {
+    "ava": "^1.4.1",
+    "eslint": "^5.16.0",
+    "firebase-functions-test": "^0.1.6",
+    "mock-req-res": "^1.1.0",
+    "nyc": "^14.1.1",
+    "proxyquire": "^2.1.0",
+    "sinon": "^7.3.2"
+  },
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.16.4",
+    "express-multipart-file-parser": "^0.1.2",
+    "firebase": "^5.11.1",
+    "firebase-admin": "^7.3.0",
+    "firebase-functions": "^2.3.1",
+    "json2csv": "^4.5.1",
+    "morgan": "^1.9.1",
+    "uuid": "^3.3.2",
+    "xhr2": "^0.1.4"
+  }
+}
