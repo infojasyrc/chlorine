@@ -21,7 +21,7 @@ app.use(function (request, response, next) {
 
 app.use(async(request, response, next) => {
 
-  if (request.path.includes('/api/authenticate')) {
+  if (request.path.includes('/api/authenticate') || request.path.includes('/api/events')) {
     next();
     return;
   }

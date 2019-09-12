@@ -5,7 +5,6 @@ const router = express.Router();
 
 router.use('/healthcheck', require('./healthcheck'));
 router.use('/attendees', require('./attendees'));
-router.use('/attendee', require('./attendee'));
 router.use('/users', require('./users'));
 router.use('/authenticate/', require('./authentication'));
 router.use('/roles/', require('./roles'));

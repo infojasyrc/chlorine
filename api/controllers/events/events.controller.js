@@ -53,9 +53,7 @@ const getWithAttendees = async (request, response) => {
   }
 
   try {
-    let events = await dbService
-      .eventsService
-      .doList(year, true);
+    let events = await dbService.eventsService.doList(year, true);
 
     return response
       .status(events.responseCode)
