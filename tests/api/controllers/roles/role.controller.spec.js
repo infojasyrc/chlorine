@@ -10,7 +10,7 @@ const proxyquire = require('proxyquire');
 
 let sandbox = null;
 
-let headquarterController;
+let roleController;
 
 test.beforeEach(() => {
   sandbox = sinon.createSandbox();
@@ -20,15 +20,19 @@ test.afterEach(() => {
   sandbox && sandbox.restore();
 });
 
-function getSetupDBService(headquarterService) {
+function getSetupDBService(roleService) {
   const firebaseApplication = {
-    auth: sinon.stub(),
-    storage: sinon.stub()
+    auth: sinon.stub()
   };
 
   const firebaseAdminApplication = {
     auth: sinon.stub(),
-    firestore: sinon.stub()
+    firestore: sinon.stub(),
+    storage: () => {
+      return {
+        bucket: () => {}
+      }
+    }
   };
 
   return proxyquire('./../../../../database', {
@@ -38,35 +42,37 @@ function getSetupDBService(headquarterService) {
     './attendees.service': () => {},
     './events.service': () => {},
     './authentication.service': () => {},
-    './roles.service': () => {},
-    './headquarters.service': () => headquarterService,
+    './roles.service': () => roleService,
+    './headquarters.service': () => {},
     './storage.service': () => {}
   });
 }
 
 function getController(allServices) {
-  return proxyquire('./../../../../api/controllers/headquarter/headquarter.controller', {
+  return proxyquire('./../../../../api/controllers/roles/role.controller', {
     './../../../database': allServices
   });
 }
 
-test.serial('Get headquarter information: validate params', async t => {
-  const req = mockRequest({});
+test.serial('Get role information: validate params', async t => {
+  const req = mockRequest({
+    params: {}
+  });
   const res = mockResponse();
 
-  let headquarterService = {};
-  const setupDBService = getSetupDBService(headquarterService);
+  let roleService = {};
+  const setupDBService = getSetupDBService(roleService);
 
-  headquarterController = getController(setupDBService);
+  roleController = getController(setupDBService);
 
-  await headquarterController.get(req, res);
+  await roleController.get(req, res);
 
   t.true(res.status.called, 'Expected response status was executed');
   t.true(res.status.calledWith(400), 'Expected response status with success response');
   t.true(res.json.called, 'Expected response json was executed');
 });
 
-test.serial('Get headquarter information: retrieve data', async t => {
+test.serial('Get role information: retrieve data', async t => {
   const req = mockRequest({
     params: {
       id: 'aaaaaaaaaa'
@@ -74,10 +80,10 @@ test.serial('Get headquarter information: retrieve data', async t => {
   });
   const res = mockResponse();
 
-  let headquarterService = {};
-  headquarterService.getHeadquarter = sandbox.stub();
-  headquarterService
-    .getHeadquarter
+  let roleService = {};
+  roleService.getRole = sandbox.stub();
+  roleService
+    .getRole
     .withArgs(req.params.id)
     .returns(Promise.resolve({
       responseCode: 200,
@@ -85,11 +91,11 @@ test.serial('Get headquarter information: retrieve data', async t => {
       message: ''
     }));
 
-  const setupDBService = getSetupDBService(headquarterService);
+  const setupDBService = getSetupDBService(roleService);
 
-  headquarterController = getController(setupDBService);
+  roleController = getController(setupDBService);
 
-  await headquarterController.get(req, res);
+  await roleController.get(req, res);
 
   t.true(res.status.called, 'Expected response status was executed');
   t.true(res.status.calledWith(200), 'Expected response status with success response');

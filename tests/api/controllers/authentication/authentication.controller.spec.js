@@ -28,7 +28,12 @@ function getSetupDBService(authenticationService, userService) {
 
   const firebaseAdminApplication = {
     auth: sinon.stub(),
-    firestore: sinon.stub()
+    firestore: sinon.stub(),
+    storage: () => {
+      return {
+        bucket: () => {}
+      }
+    }
   };
 
   if (!userService) {

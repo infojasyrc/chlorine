@@ -33,7 +33,12 @@ function getSetupDBService(eventsService) {
 
   const firebaseAdminApplication = {
     auth: sinon.stub(),
-    firestore: sinon.stub()
+    firestore: sinon.stub(),
+    storage: () => {
+      return {
+        bucket: () => {}
+      }
+    }
   };
 
   return proxyquire('./../../../../database', {

@@ -1,3 +1,5 @@
+'use strict';
+
 const logger = require('morgan');
 const app = require('express')();
 const cors = require('cors');
@@ -21,7 +23,6 @@ app.use(async(request, response, next) => {
 
   if (request.path.includes('/api/authenticate')) {
     next();
-
     return;
   }
 
@@ -31,16 +32,10 @@ app.use(async(request, response, next) => {
     response
       .status(401)
       .json({status: '401', message: 'Unauthorized', data: {}});
-
     return;
   }
 
   try {
-    // const authenticationResponse = await dbService   .authenticationService
-    // .verifyToken(token); if (!authenticationResponse.data.verified) {   response
-    // .status(401)     .json({status: '401', message: 'Unauthorized', data: {}});
-    // return; }
-
     next();
   } catch (error) {
     response
@@ -55,8 +50,12 @@ app.use(bodyParser.urlencoded({ // to support URL-encoded bodies
   extended: true
 }));
 
-app.use(logger(':date[iso] - :remote-addr ":method :url HTTP/:http-version" status::status :res[' +
-    'content-length] bytes - :response-time \bms'));
+app.use(
+  logger(
+    ':date[iso] - :remote-addr ":method :url HTTP/:http-version" status::status :res[' +
+    'content-length] bytes - :response-time \bms'
+  )
+);
 
 app.use(fileParser);
 app.use('/api/', require('./api/controllers'));

@@ -8,7 +8,7 @@ const {
 } = require('mock-req-res');
 const proxyquire = require('proxyquire');
 
-const setupBaseController = require('./../../../../api/controllers/base.controller');
+const setupBaseController = require('../../../../api/controllers/base.controller');
 
 let sandbox = null;
 
@@ -28,7 +28,12 @@ test.beforeEach(() => {
 
   firebaseAdminApplication = {
     auth: sinon.stub(),
-    firestore: sinon.stub()
+    firestore: sinon.stub(),
+    storage: () => {
+      return {
+        bucket: () => {}
+      }
+    }
   };
 
   eventsService = {};
@@ -57,7 +62,7 @@ function getSetupDBService(eventsService, storageService) {
 }
 
 function getController(allServices) {
-  return proxyquire('./../../../../api/controllers/event/event.controller', {
+  return proxyquire('./../../../../api/controllers/events/event.controller', {
     './../../../database': allServices
   });
 }

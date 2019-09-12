@@ -20,7 +20,12 @@ test.beforeEach(() => {
 
   firebaseAdminApplication = {
     auth: sinon.stub(),
-    firestore: sinon.stub()
+    firestore: sinon.stub(),
+    storage: () => {
+      return {
+        bucket: () => {}
+      }
+    }
   };
 
   const setupDatabase = proxyquire('./../../database', {

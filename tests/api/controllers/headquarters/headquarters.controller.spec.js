@@ -11,44 +11,31 @@ const proxyquire = require('proxyquire');
 let sandbox = null;
 
 let headquarterController;
-let firebaseAdminApplication = null;
-let firebaseApplication = null;
-let headquarterService;
 
 test.beforeEach(() => {
   sandbox = sinon.createSandbox();
-
-  firebaseApplication = {
-    auth: sinon.stub(),
-    storage: sinon.stub()
-  };
-
-  firebaseAdminApplication = {
-    auth: sinon.stub(),
-    firestore: sinon.stub()
-  };
-
-  headquarterService = {};
 });
 
 test.afterEach(() => {
   sandbox && sandbox.restore();
 });
 
-test.serial('Get headquarters', async t => {
-  const req = mockRequest({});
-  const res = mockResponse();
+function getSetupDBService(headquarterService) {
+  const firebaseApplication = {
+    auth: sinon.stub()
+  };
 
-  headquarterService.doList = sandbox.stub();
-  headquarterService
-    .doList
-    .returns(Promise.resolve({
-      responseCode: 200,
-      data: [],
-      message: ''
-    }));
+  const firebaseAdminApplication = {
+    auth: sinon.stub(),
+    firestore: sinon.stub(),
+    storage: () => {
+      return {
+        bucket: () => {}
+      }
+    }
+  };
 
-  const setupDBService = proxyquire('./../../../../database', {
+  return proxyquire('./../../../../database', {
     './firebase.application': () => firebaseApplication,
     './firebase-admin.application': () => firebaseAdminApplication,
     './user.service': () => {},
@@ -59,10 +46,31 @@ test.serial('Get headquarters', async t => {
     './headquarters.service': () => headquarterService,
     './storage.service': () => {}
   });
+}
 
-  headquarterController = proxyquire('./../../../../api/controllers/headquarters/headquarters.controller', {
-    './../../../database': setupDBService
+function getController(allServices) {
+  return proxyquire('./../../../../api/controllers/headquarters/headquarters.controller', {
+    './../../../database': allServices
   });
+}
+
+test.serial('Get headquarters', async t => {
+  const req = mockRequest({});
+  const res = mockResponse();
+
+  const headquarterService = {};
+  headquarterService.doList = sandbox.stub();
+  headquarterService
+    .doList
+    .returns(Promise.resolve({
+      responseCode: 200,
+      data: [],
+      message: ''
+    }));
+
+  const setupDBService = getSetupDBService(headquarterService);
+
+  headquarterController = getController(setupDBService);
 
   await headquarterController.get(req, res);
 
