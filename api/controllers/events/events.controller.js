@@ -7,66 +7,39 @@ let baseController = new setupBaseController();
 const dbService = setupDBService();
 
 const get = async (request, response) => {
-  let year = new Date().getFullYear();
-  let headquarterId = '';
-  let showAll = true;
+  const eventParameters = {};
+  let responseCode;
+  let responseData;
 
-  if (request.params.year) {
-    year = request.params.year;
-  }
-
-  if (request.params.headquarterId) {
-    headquarterId = request.params.headquarterId;
-  }
-
-  if (request.params.showAll) {
-    showAll = request.params.showAll === "true";
-  }
-
-  if (!headquarterId) {
+  if (!request.params.headquarterId) {
     return response
       .status(400)
       .json(baseController.getErrorResponse('No Headquarter provided'));
   }
 
-  try {
-    let events = await dbService
-      .eventsService
-      .doList(year, false, headquarterId, showAll);
+  eventParameters.year = !request.params.year ?
+    new Date().getFullYear() : request.params.year;
 
-    return response
-      .status(events.responseCode)
-      .json(baseController.getSuccessResponse(events.data, events.message));
-  } catch (error) {
-    console.error('Error while listing events', error);
-    return response
-      .status(500)
-      .json(baseController.getErrorResponse('Error while listing events'));
-  }
-};
+  eventParameters.headquarterId = request.params.headquarterId;
 
-const getWithAttendees = async (request, response) => {
-  let year = new Date().getFullYear();
+  eventParameters.showAll = !request.params.showAll ?
+    false : request.params.showAll === "true";
 
-  if (request.params.year) {
-    year = request.params.year;
-  }
+  eventParameters.withAttendees = !request.params.withAttendees ?
+    false : request.params.withAttendees === "true";
 
   try {
-    let events = await dbService.eventsService.doList(year, true);
+    const events = await dbService.eventsService.doList(eventParameters);
 
-    return response
-      .status(events.responseCode)
-      .json(baseController.getSuccessResponse(events.data, events.message));
+    responseCode = events.responseCode;
+    responseData = baseController.getSuccessResponse(events.data, events.message);
   } catch (error) {
     console.error('Error while listing events', error);
-    return response
-      .status(500)
-      .json(baseController.getErrorResponse('Error while listing events'));
+    responseCode = 500;
+    responseData = baseController.getErrorResponse('Error while listing events');
   }
+
+  return response.status(responseCode).json(responseData);
 };
 
-module.exports = {
-  get,
-  getWithAttendees
-};
+module.exports = { get };

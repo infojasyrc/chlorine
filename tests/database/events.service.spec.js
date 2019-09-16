@@ -98,7 +98,7 @@ test.serial('Create event', async t => {
 });
 
 test.serial('Do list all events without year and headquarter', async t => {
-  let eventsData = await eventsService.doList();
+  let eventsData = await eventsService.doList({});
 
   t.is(eventsData.hasOwnProperty('message'), true, 'Expected message key');
   t.is(eventsData.hasOwnProperty('data'), true, 'Expected data key');
@@ -106,9 +106,12 @@ test.serial('Do list all events without year and headquarter', async t => {
 });
 
 test.skip('Do list all events with year and headquarter', async t => {
-  const year = '2019';
-  const headquarterId = 'aaaaaaa';
-  let eventsData = await eventsService.doList(year, headquarterId);
+  const eventsParams = {
+    year: '2019',
+    headquarterId: 'aaaaaaa'
+  };
+
+  let eventsData = await eventsService.doList(eventsParams);
 
   t.is(eventsData.hasOwnProperty('message'), true, 'Expected message key');
   t.is(eventsData.hasOwnProperty('data'), true, 'Expected data key');

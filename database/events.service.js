@@ -31,20 +31,28 @@ module.exports = function setupEventsService(dbInstance) {
     return baseService.returnData;
   }
 
-  async function doList(year, withAttendeesOnly, headquarterId, showAllStatus) {
+  async function doList(eventParams) {
     let allEvents = [];
 
+    const {
+      year,
+      withAttendees,
+      headquarterId,
+      showAllStatus
+    } = eventParams;
+
+    if (!year) {
+      baseService.returnData.message = 'No year provided';
+      baseService.returnData.responseCode = 400;
+      baseService.returnData.data = allEvents;
+      return baseService.returnData;
+    }
+
     try {
-      if (!year) {
-        baseService.returnData.message = 'No year provided';
-        baseService.returnData.responseCode = 400;
-        baseService.returnData.data = allEvents;
-        return baseService.returnData;
-      }
 
       let rootQuery = collection.where('year', '==', parseInt(year));
 
-      if (!withAttendeesOnly) {
+      if (headquarterId) {
         rootQuery = rootQuery.where('headquarter.id', '==', headquarterId);
       }
 
@@ -56,7 +64,7 @@ module.exports = function setupEventsService(dbInstance) {
           ...doc.data()
         };
 
-        if (!withAttendeesOnly) {
+        if (!withAttendees) {
           if (showAllStatus || event.status !== 'closed') {
             allEvents.push(event);
           }

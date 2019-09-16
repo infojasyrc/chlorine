@@ -79,12 +79,12 @@ test.serial('Check get events: validate params', async t => {
 });
 
 test.serial('Check get events: retrieve all', async t => {
-  const headquarterId = 'aaaaaaaaa';
-  const req = mockRequest({
+  const requestParameters = {
     params: {
-      headquarterId: headquarterId
+      headquarterId: 'headquarterId'
     }
-  });
+  };
+  const req = mockRequest(requestParameters);
   const res = mockResponse();
   const eventServiceResponse = {
     responseCode: 200,
@@ -92,11 +92,18 @@ test.serial('Check get events: retrieve all', async t => {
     message: 'Getting events information successfully'
   };
 
-  let eventsService = {};
+  const eventsParameters = {
+    year: new Date().getFullYear(),
+    headquarterId: requestParameters.params.headquarterId,
+    showAll: false,
+    withAttendees: false
+  };
+
+  const eventsService = {};
   eventsService.doList = sandbox.stub();
   eventsService
     .doList
-    .withArgs(new Date().getFullYear(), false, headquarterId)
+    .withArgs(eventsParameters)
     .returns(Promise.resolve(eventServiceResponse));
 
   const setupDBService = getSetupDBService(eventsService);
@@ -117,19 +124,26 @@ test.serial('Check get events: retrieve all', async t => {
 });
 
 test.serial('Check get events: catch error', async t => {
-  const headquarterId = 'aaaaaaaaa';
-  const req = mockRequest({
+  const requestParameters = {
     params: {
-      headquarterId: headquarterId
+      headquarterId: 'headquarterId'
     }
-  });
+  };
+  const req = mockRequest(requestParameters);
   const res = mockResponse();
+
+  const eventsParameters = {
+    year: new Date().getFullYear(),
+    headquarterId: requestParameters.params.headquarterId,
+    showAll: false,
+    withAttendees: false
+  };
 
   let eventsService = {};
   eventsService.doList = sandbox.stub();
   eventsService
     .doList
-    .withArgs(new Date().getFullYear(), false, headquarterId)
+    .withArgs(eventsParameters)
     .returns(Promise.reject());
 
   const setupDBService = getSetupDBService(eventsService);
@@ -144,9 +158,13 @@ test.serial('Check get events: catch error', async t => {
 });
 
 test.serial('Check get events with attendees: retrieve all', async t => {
-  const req = mockRequest({
-    params: {}
-  });
+  const requestParameters = {
+    params: {
+      withAttendees: 'true',
+      headquarterId: 'headquarterId'
+    }
+  };
+  const req = mockRequest(requestParameters);
   const res = mockResponse();
   const eventServiceResponse = {
     data: [],
@@ -154,18 +172,25 @@ test.serial('Check get events with attendees: retrieve all', async t => {
     responseCode: 200
   };
 
-  let eventsService = {};
+  const eventsParameters = {
+    year: new Date().getFullYear(),
+    headquarterId: requestParameters.params.headquarterId,
+    showAll: false,
+    withAttendees: true
+  };
+
+  const eventsService = {};
   eventsService.doList = sandbox.stub();
   eventsService
     .doList
-    .withArgs(new Date().getFullYear(), true)
+    .withArgs(eventsParameters)
     .returns(Promise.resolve(eventServiceResponse));
 
   const setupDBService = getSetupDBService(eventsService);
 
   eventsController = getController(setupDBService);
 
-  await eventsController.getWithAttendees(req, res);
+  await eventsController.get(req, res);
 
   t.true(res.status.called, 'Expected response status was executed');
   t.true(res.status.calledWith(eventServiceResponse.responseCode), 'Expected response status with success response');
@@ -176,28 +201,4 @@ test.serial('Check get events with attendees: retrieve all', async t => {
       data: eventServiceResponse.data,
       message: eventServiceResponse.message
     }), 'Expected response json was executed');
-});
-
-test.serial('Check get events with attendees: catch error', async t => {
-  const req = mockRequest({
-    params: {}
-  });
-  const res = mockResponse();
-
-  let eventsService = {};
-  eventsService.doList = sandbox.stub();
-  eventsService
-    .doList
-    .withArgs(new Date().getFullYear(), true)
-    .returns(Promise.reject());
-
-  const setupDBService = getSetupDBService(eventsService);
-
-  eventsController = getController(setupDBService);
-
-  await eventsController.getWithAttendees(req, res);
-
-  t.true(res.status.called, 'Expected response status was executed');
-  t.true(res.status.calledWith(500), 'Expected response status with success response');
-  t.true(res.json.called, 'Expected response json was executed');
 });
