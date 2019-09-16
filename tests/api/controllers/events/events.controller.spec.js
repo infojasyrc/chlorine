@@ -62,7 +62,8 @@ function getController(allServices) {
 
 test.serial('Check get events: validate params', async t => {
   const req = mockRequest({
-    params: {}
+    params: {},
+    query: {}
   });
   const res = mockResponse();
 
@@ -80,7 +81,8 @@ test.serial('Check get events: validate params', async t => {
 
 test.serial('Check get events: retrieve all', async t => {
   const requestParameters = {
-    params: {
+    params: {},
+    query: {
       headquarterId: 'headquarterId'
     }
   };
@@ -94,7 +96,7 @@ test.serial('Check get events: retrieve all', async t => {
 
   const eventsParameters = {
     year: new Date().getFullYear(),
-    headquarterId: requestParameters.params.headquarterId,
+    headquarterId: requestParameters.query.headquarterId,
     showAll: false,
     withAttendees: false
   };
@@ -125,7 +127,8 @@ test.serial('Check get events: retrieve all', async t => {
 
 test.serial('Check get events: catch error', async t => {
   const requestParameters = {
-    params: {
+    params: {},
+    query: {
       headquarterId: 'headquarterId'
     }
   };
@@ -134,7 +137,7 @@ test.serial('Check get events: catch error', async t => {
 
   const eventsParameters = {
     year: new Date().getFullYear(),
-    headquarterId: requestParameters.params.headquarterId,
+    headquarterId: requestParameters.query.headquarterId,
     showAll: false,
     withAttendees: false
   };
@@ -159,7 +162,8 @@ test.serial('Check get events: catch error', async t => {
 
 test.serial('Check get events with attendees: retrieve all', async t => {
   const requestParameters = {
-    params: {
+    params: {},
+    query: {
       withAttendees: 'true',
       headquarterId: 'headquarterId'
     }
@@ -174,7 +178,7 @@ test.serial('Check get events with attendees: retrieve all', async t => {
 
   const eventsParameters = {
     year: new Date().getFullYear(),
-    headquarterId: requestParameters.params.headquarterId,
+    headquarterId: requestParameters.query.headquarterId,
     showAll: false,
     withAttendees: true
   };
