@@ -1,8 +1,7 @@
-MeetApp Backend
+Event Manager Backend
 ===
 
-This project will handle a REST API to be used for meetapp frontend request and use nodejs to handle
-all the communication with firebase.
+This project will handle a REST API to handle events: Create, update, remove and list.
 
 From Firebase, we will use:
 
@@ -43,18 +42,18 @@ Available endpoints for local development
 using ```node index.js```
 ```
 - get http://localhost:5001/api/healthcheck/
-- get http://localhost:5001/api/users/
-- get http://localhost:5001/api/user/:id
-- post http://localhost:5001/api/user/
-- put http://localhost:5001/api/user/:id
-- delete http://localhost:5001/api/user/:id
+- get http://localhost:5001/api/users
+- get http://localhost:5001/api/users/:id
+- post http://localhost:5001/api/users/
+- put http://localhost:5001/api/users/:id
+- delete http://localhost:5001/api/users/:id
 ```
 
 Folder structure
 ===
 
 database: This folder will group all database functions
-controller: This folder will group all functions to handle the enpoints.
+api: This folder will group all functions to handle the enpoints.
 
 For Debugging
 ===
@@ -91,3 +90,5 @@ However, on MacOS, if you use nvm within a specific version, please add the foll
   ]
 }
 ```
+
+Note: After using login endpoint, add Authorization key for each request with login token's content.

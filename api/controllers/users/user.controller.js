@@ -18,9 +18,7 @@ const get = async (request, response) => {
   let requestedUserId = request.params.id;
 
   try {
-    let userData = await dbService
-      .userService
-      .findById(requestedUserId);
+    let userData = await dbService.userService.findById(requestedUserId);
 
     responseCode = userData.responseCode;
     responseData = baseController.getSuccessResponse(
@@ -82,7 +80,7 @@ const post = async (request, response) => {
     role: request.body.role
   };
 
-  let responseCode;
+  let responseCode = 500;
   let responseData;
 
   try {
@@ -94,7 +92,6 @@ const post = async (request, response) => {
       newUserData.message
     );
   } catch (err) {
-    responseCode = 500;
     console.error('Error creating a new user: ', err);
     responseData = baseController.getErrorResponse('Error creating a new user');
   }
