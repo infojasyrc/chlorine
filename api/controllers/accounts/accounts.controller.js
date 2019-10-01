@@ -12,12 +12,12 @@ const checkBalance = async (request, response) => {
   let responseCode;
   let responseData;
 
-  if (!request.body.idToken) {
+  if (!request.headers.authorization) {
     return response.status(400).json(baseController.getErrorResponse('No session information'));
   }
 
   try {
-    const sessionInfo = await sessionService.getUserSession(request.body.idToken);
+    const sessionInfo = await sessionService.getUserSession(request.headers.authorization);
 
     if (sessionInfo.data) {
       const balanceResponse = await accountsService.checkBalance(sessionInfo.data);

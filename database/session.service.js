@@ -11,7 +11,7 @@ module.exports = function setupSessionService (adminAuthInstance) {
   async function getUserSession (idToken) {
 
     try {
-      const decodedToken = await adminAuth.auth().verifyIdToken(idToken);
+      const decodedToken = await adminAuth.verifyIdToken(idToken);
 
       baseService.returnData.data = decodedToken.uid;
       baseService.returnData.message = 'Getting user session information successfully';
