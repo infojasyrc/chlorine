@@ -37,7 +37,8 @@ test.beforeEach(() => {
     './authentication.service': () => {},
     './roles.service': () => {},
     './headquarters.service': () => {},
-    './storage.service': () => {}
+    './storage.service': () => {},
+    './accounts.service': () => {}
   });
   database = setupDatabase();
 });

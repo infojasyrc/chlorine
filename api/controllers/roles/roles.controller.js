@@ -23,7 +23,7 @@ const get = async (request, response) => {
     console.error('Error getting all roles: ', err);
     responseCode = 500;
     responseData = baseController.getErrorResponse('Error getting all roles');
-  };
+  }
 
   return response
     .status(responseCode)

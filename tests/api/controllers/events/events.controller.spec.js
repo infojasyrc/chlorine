@@ -50,7 +50,8 @@ function getSetupDBService(eventsService) {
     './authentication.service': () => {},
     './roles.service': () => {},
     './headquarters.service': () => {},
-    './storage.service': () => {}
+    './storage.service': () => {},
+    './accounts.service': () => {}
   });
 }
 
@@ -75,7 +76,7 @@ test.serial('Check get events: validate params', async t => {
   await eventsController.get(req, res);
 
   t.true(res.status.called, 'Expected response status was executed');
-  t.true(res.status.calledWith(400), 'Expected response status with success response');
+  t.true(res.status.calledWith(400), 'Expected response status with failure response');
   t.true(res.json.called, 'Expected response json was executed');
 });
 

@@ -11,5 +11,6 @@ router.use('/roles', require('./roles'));
 router.use('/headquarters', require('./headquarters'));
 router.use('/events', require('./events'));
 router.use('/image', require('./image'));
+router.use('/accounts', require('./image'));
 
 module.exports = router;

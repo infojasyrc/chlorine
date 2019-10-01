@@ -21,7 +21,8 @@ test.beforeEach(() => {
       storageService: {},
       userService: {
         create: {}
-      }
+      },
+      accountsService: {}
     };
   };
 

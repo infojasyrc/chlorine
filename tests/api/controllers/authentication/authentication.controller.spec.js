@@ -49,7 +49,8 @@ function getSetupDBService(authenticationService, userService) {
     './authentication.service': () => authenticationService,
     './roles.service': () => {},
     './headquarters.service': () => {},
-    './storage.service': () => {}
+    './storage.service': () => {},
+    './accounts.service': () => {}
   });
 }
 
