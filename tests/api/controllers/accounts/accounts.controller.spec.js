@@ -46,11 +46,12 @@ function getController() {
   });
 }
 
-test.serial('Check get balance', async t => {
+test.serial('Check get balance: success response', async t => {
   const req = mockRequest({
     params: {},
-    body: {
-      idToken: 'xxx'
+    body: {},
+    headers: {
+      authorization: 'thisIsAUserToken'
     },
     query: {}
   });
@@ -62,5 +63,23 @@ test.serial('Check get balance', async t => {
 
   t.true(res.status.called, 'Expected response status was executed');
   t.true(res.status.calledWith(200), 'Expected response status with success response');
+  t.true(res.json.called, 'Expected response json was executed');
+});
+
+test.serial('Check get balance: Response 400 for no token information', async t => {
+  const req = mockRequest({
+    params: {},
+    body: {},
+    headers: {},
+    query: {}
+  });
+  const res = mockResponse();
+
+  const accountsController = getController();
+
+  await accountsController.checkBalance(req, res);
+
+  t.true(res.status.called, 'Expected response status was executed');
+  t.true(res.status.calledWith(400), 'Expected 400 response');
   t.true(res.json.called, 'Expected response json was executed');
 });
