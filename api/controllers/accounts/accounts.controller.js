@@ -5,20 +5,32 @@ const serviceContainer = require('./../../../database/service.container');
 
 const baseController = new setupBaseController();
 const accountsService = serviceContainer('accounts');
+const sessionService = serviceContainer('session');
 
 const checkBalance = async (request, response) => {
 
   let responseCode;
   let responseData;
 
-  try {
-    const balanceResponse = await accountsService.checkBalance();
+  if (!request.body.idToken) {
+    return response.status(400).json(baseController.getErrorResponse('No session information'));
+  }
 
-    responseCode = balanceResponse.responseCode;
-    responseData = baseController.getSuccessResponse(
-      balanceResponse.data,
-      balanceResponse.message
-    );
+  try {
+    const sessionInfo = await sessionService.getUserSession(request.body.idToken);
+
+    if (sessionInfo.data) {
+      const balanceResponse = await accountsService.checkBalance(sessionInfo.data);
+
+      responseCode = balanceResponse.responseCode;
+      responseData = baseController.getSuccessResponse(
+        balanceResponse.data,
+        balanceResponse.message
+      );
+    } else {
+      responseCode = sessionInfo.responseCode;
+      responseData = baseController.getErrorResponse(sessionInfo.message);
+    }
 
   } catch (err) {
     console.error('Error getting all balance: ', err);

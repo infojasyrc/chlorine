@@ -19,15 +19,28 @@ test.afterEach(() => {
 
 function getController() {
   return proxyquire('./../../../../api/controllers/accounts/accounts.controller', {
-    './../../../database/service.container': () => {
-      return {
-        checkBalance: () => {
-          return Promise.resolve({
-            responseCode: 200,
-            data: [],
-            message: 'Getting data successfully'
-          });
-        }
+    './../../../database/service.container': (serviceName) => {
+      switch(serviceName) {
+        case 'accounts':
+          return {
+            checkBalance: () => {
+              return Promise.resolve({
+                responseCode: 200,
+                data: [],
+                message: 'Getting data successfully'
+              });
+            }
+          };
+        case 'session':
+          return {
+            getUserSession: () => {
+              return Promise.resolve({
+                responseCode: 200,
+                data: 'thisIsAUserId',
+                message: 'Getting data successfully'
+              });
+            }
+          };
       }
     }
   });
@@ -36,6 +49,9 @@ function getController() {
 test.serial('Check get balance', async t => {
   const req = mockRequest({
     params: {},
+    body: {
+      idToken: 'xxx'
+    },
     query: {}
   });
   const res = mockResponse();

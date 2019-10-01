@@ -37,5 +37,9 @@ module.exports = function getContainer(service) {
     return dbService.accountsService;
   }
 
+  if (service === 'session') {
+    return dbService.sessionService;
+  }
+
   throw new Error('Invalid Service');
 };
