@@ -7,7 +7,7 @@ module.exports = function setupAccountsService (dbInstance) {
   const collection = dbInstance.collection('accounts');
   const baseService = new setupBaseService();
 
-  async function checkBalance (userId) {
+  async function getAccounts (userId) {
     const allUserAccounts = [];
 
     try {
@@ -16,11 +16,11 @@ module.exports = function setupAccountsService (dbInstance) {
       const dataSnapshot = await accountsQuery.get();
 
       dataSnapshot.forEach((doc) => {
-          const userAccount = {
-            id: doc.id,
-            ...doc.data()
-          };
-          allUserAccounts.push(userAccount);
+        const userAccount = {
+          id: doc.id,
+          ...doc.data()
+        };
+        allUserAccounts.push(userAccount);
       });
 
       baseService.returnData.message = 'Getting account successfully';
@@ -36,7 +36,28 @@ module.exports = function setupAccountsService (dbInstance) {
     return baseService.returnData;
   }
 
+  async function getAll (userId) {
+    return await getAccounts(userId);
+  }
+
+  async function checkBalance (userId) {
+    const allAccountsResponse = await getAccounts(userId);
+
+    // No errors for calculating the balance
+    if (allAccountsResponse.responseCode === 200) {
+      let balance = 0;
+      allAccountsResponse.data.forEach(account => {
+        balance += parseFloat(account.balance);
+      });
+      allAccountsResponse.data = balance;
+      allAccountsResponse.message = 'Getting data successfully';
+    }
+
+    return allAccountsResponse;
+  }
+
   return {
+    getAll,
     checkBalance
   }
 }
