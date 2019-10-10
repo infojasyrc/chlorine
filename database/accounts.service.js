@@ -40,6 +40,36 @@ module.exports = function setupAccountsService (dbInstance) {
     return await getAccounts(userId);
   }
 
+  async function getDefaultAccount(userId) {
+    const defaultAccounts = [];
+    try {
+
+      const accountsQuery = collection.where('userId', '==', userId)
+        .where('default', '==' , true);
+
+      const dataSnapshot = await accountsQuery.get();
+
+      dataSnapshot.forEach((doc) => {
+        const userAccount = {
+          id: doc.id,
+          ...doc.data()
+        };
+        defaultAccounts.push(userAccount);
+      });
+
+    } catch (err) {
+      const errorMessage = 'Error getting default account';
+      console.error(errorMessage, err);
+      defaultAccounts.push({});
+      baseService.returnData.message = errorMessage;
+      baseService.returnData.responseCode = 500;
+    }
+
+    baseService.returnData.data = defaultAccounts[0];
+
+    return baseService.returnData;
+  }
+
   async function checkBalance (userId) {
     const allAccountsResponse = await getAccounts(userId);
 
@@ -57,7 +87,8 @@ module.exports = function setupAccountsService (dbInstance) {
   }
 
   return {
+    checkBalance,
     getAll,
-    checkBalance
+    getDefaultAccount
   }
 }

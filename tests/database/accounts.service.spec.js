@@ -28,7 +28,8 @@ test.beforeEach(() => {
                     return {
                       name: 'Cuenta Corriente',
                       balance: 20000000.88,
-                      userId: userId
+                      userId: userId,
+                      default: true,
                     };
                   }
                 },
@@ -38,12 +39,32 @@ test.beforeEach(() => {
                     return {
                       name: 'Cuenta Ahorros',
                       balance: 20000000.88,
-                      userId: userId
+                      userId: userId,
+                      default: false
                     };
                   }
                 }
               ]
             );
+          },
+          where: () => {
+            return {
+              get: () => {
+                return Promise.resolve(
+                  [{
+                    id: 'aaaaaa',
+                    data: () => {
+                      return {
+                        name: 'Cuenta Corriente',
+                        balance: 20000000.88,
+                        userId: userId,
+                        default: true
+                      };
+                    }
+                  }]
+                );
+              }
+            }
           }
         }
       }
@@ -70,5 +91,16 @@ test.serial('Get all accounts', async t => {
   t.true(allAccounts.hasOwnProperty('message'), 'Expected message key');
   t.true(allAccounts.hasOwnProperty('data'), 'Expected data key');
   t.true(allAccounts.data.length > 0, 'Expected accounts in data');
+});
+
+test.serial('Get default account', async t => {
+  const defaultAccountResponse = await accountsService.getDefaultAccount(userId);
+
+  t.true(defaultAccountResponse.hasOwnProperty('message'), 'Expected message key');
+  t.true(defaultAccountResponse.hasOwnProperty('data'), 'Expected data key');
+  t.true(defaultAccountResponse.data.hasOwnProperty('id'), 'Expected id property');
+  t.true(defaultAccountResponse.data.hasOwnProperty('name'), 'Expected name property');
+  t.true(defaultAccountResponse.data.hasOwnProperty('default'), 'Expected default property');
+  t.true(defaultAccountResponse.data.default, 'Expected default account key as true');
 });
 
