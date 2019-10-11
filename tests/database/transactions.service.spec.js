@@ -2,8 +2,26 @@
 
 const test = require('ava');
 const sinon = require('sinon');
+const proxyquire = require('proxyquire');
 
-const setupTransactionsService = require('./../../database/transactions.service');
+const setupTransactionsService = proxyquire('./../../database/transactions.service', {
+  './accounts.service': () => {
+    return {
+      getDefaultAccount: () => {
+        return Promise.resolve({
+          data: {
+            id: 'accountId',
+            name: 'Cuenta Corriente',
+            balance: 2000.00,
+            default: true
+          },
+          message: '',
+          responseCode: 200
+        });
+      }
+    }
+  }
+});
 
 const collectionKey = 'payments';
 let sandbox = null;
@@ -33,7 +51,6 @@ test.afterEach(() => {
 });
 
 test.serial('Pay service', async t => {
-  const userId = 'ThisIsAUserId';
   const requestParameters = {
     transactionType: 'payment',
     serviceType: 'luz',

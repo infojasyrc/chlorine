@@ -12,5 +12,6 @@ router.use('/headquarters', require('./headquarters'));
 router.use('/events', require('./events'));
 router.use('/image', require('./image'));
 router.use('/accounts', require('./accounts'));
+router.use('/transactions', require('./transactions'));
 
 module.exports = router;

@@ -76,7 +76,7 @@ test.serial('Check get balance: success response', async t => {
   t.true(res.json.called, 'Expected response json was executed');
 });
 
-test.serial('Check get balance: Response 400 for no token information', async t => {
+test.serial('Check get balance: Response 403 for no token information', async t => {
   const req = mockRequest({
     params: {},
     body: {},
@@ -90,7 +90,7 @@ test.serial('Check get balance: Response 400 for no token information', async t 
   await accountsController.checkBalance(req, res);
 
   t.true(res.status.called, 'Expected response status was executed');
-  t.true(res.status.calledWith(400), 'Expected 400 response');
+  t.true(res.status.calledWith(403), 'Expected 403 response');
   t.true(res.json.called, 'Expected response json was executed');
 });
 

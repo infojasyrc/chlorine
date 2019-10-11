@@ -58,7 +58,8 @@ function getSetupDBService(eventsService, storageService) {
     './roles.service': () => {},
     './headquarters.service': () => {},
     './storage.service': () => mockStorageService,
-    './accounts.service': () => {}
+    './accounts.service': () => {},
+    './transactions.service': () => {}
   });
 }
 

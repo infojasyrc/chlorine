@@ -1,35 +1,10 @@
 'use strict';
 
 const test = require('ava');
-const proxyquire = require('proxyquire');
 
-let serviceContainer;
+const serviceContainer = require('./../../database/service.container');
 
-test.beforeEach(() => {
-  const allServices = () => {
-    // Add more functions per service according to the unit tests
-    return {
-      eventsService: {
-        create: {},
-        doList: {},
-        findById: {}
-      },
-      authenticationService: {},
-      attendeesService: {},
-      headquartersService: {},
-      rolesService: {},
-      storageService: {},
-      userService: {
-        create: {}
-      },
-      accountsService: {}
-    };
-  };
-
-  serviceContainer = proxyquire('./../../database/service.container', {
-    './': allServices
-  });
-});
+test.beforeEach(() => {});
 
 
 test.serial('Check events service', t => {
@@ -47,4 +22,10 @@ test.serial('Check users service', t => {
 test.serial('Not service found', t => {
   const error = t.throws(() => { serviceContainer('event'); }, Error);
   t.is(error.message, 'Invalid Service');
+});
+
+test.serial('Check transactions service', t => {
+  const transactionsService = serviceContainer('transactions');
+
+  t.true(transactionsService.hasOwnProperty('makeTransaction'), 'Expected makeTransaction property');
 });

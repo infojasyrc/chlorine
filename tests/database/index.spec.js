@@ -38,7 +38,8 @@ test.beforeEach(() => {
     './roles.service': () => {},
     './headquarters.service': () => {},
     './storage.service': () => {},
-    './accounts.service': () => {}
+    './accounts.service': () => {},
+    './transactions.service': () => {}
   });
   database = setupDatabase();
 });

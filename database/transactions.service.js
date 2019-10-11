@@ -1,20 +1,33 @@
 'use service';
 
 const setupBaseService = require('./base.service');
+const setupAccountsService = require('./accounts.service');
 
 module.exports = function setupTransactionsService (dbInstance) {
 
+  const accountsService = setupAccountsService(dbInstance);
   const collection = dbInstance.collection('payments');
   const baseService = new setupBaseService();
 
   async function makeTransaction (userId, transactionData) {
-    const newTracsaction = {
-      userId,
-      ...transactionData
-    };
     let transactionCreated = null;
 
     try {
+      const defaultAccountResponse = await accountsService.getDefaultAccount(userId);
+
+      if (defaultAccountResponse.responseCode !== 200) {
+        baseService.returnData.responseCode = defaultAccountResponse.responseCode;
+        baseService.returnData.message = defaultAccountResponse.message;
+        baseService.returnData.data = null;
+        return baseService.returnData;
+      }
+
+      const newTracsaction = {
+        userId,
+        ...transactionData,
+        accountId: defaultAccountResponse.data.id
+      };
+
       const transactionRef = await collection.add(newTracsaction);
       transactionCreated = {
         id: transactionRef.id,
@@ -36,5 +49,5 @@ module.exports = function setupTransactionsService (dbInstance) {
 
   return {
     makeTransaction
-  }
+  };
 }

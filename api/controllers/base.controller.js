@@ -24,6 +24,10 @@ class baseController {
     this.responseData.message = message;
     return this.responseData;
   }
+
+  isTokenInHeader(request) {
+    return request.headers.authorization;
+  }
 }
 
 module.exports = baseController;

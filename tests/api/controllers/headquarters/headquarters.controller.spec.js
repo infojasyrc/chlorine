@@ -45,7 +45,8 @@ function getSetupDBService(headquarterService) {
     './roles.service': () => {},
     './headquarters.service': () => headquarterService,
     './storage.service': () => {},
-    './accounts.service': () => {}
+    './accounts.service': () => {},
+    './transactions.service': () => {}
   });
 }
 

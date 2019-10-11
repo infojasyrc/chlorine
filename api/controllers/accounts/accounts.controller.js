@@ -10,13 +10,9 @@ const sessionService = serviceContainer('session');
 let responseCode;
 let responseData;
 
-const isTokenInHeader = request => {
-  return request.headers.authorization;
-}
-
 const checkBalance = async (request, response) => {
-  if (!isTokenInHeader(request)) {
-    return response.status(400).json(baseController.getErrorResponse('No session information'));
+  if (!baseController.isTokenInHeader(request)) {
+    return response.status(403).json(baseController.getErrorResponse('No session information'));
   }
 
   try {
@@ -45,7 +41,7 @@ const checkBalance = async (request, response) => {
 }
 
 const getAll = async (request, response) => {
-  if (!isTokenInHeader(request)) {
+  if (!baseController.isTokenInHeader(request)) {
     return response.status(400).json(baseController.getErrorResponse('No session information'));
   }
 

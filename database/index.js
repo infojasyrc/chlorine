@@ -12,6 +12,7 @@ const setupHeadquartersService = require('./headquarters.service');
 const setupStorageService = require('./storage.service');
 const setupAccountsService = require('./accounts.service');
 const setupSessionService = require('./session.service');
+const setupTransactionsService = require('./transactions.service');
 
 module.exports = function () {
 
@@ -27,6 +28,7 @@ module.exports = function () {
   const storageService = setupStorageService(adminApp.storage().bucket());
   const accountsService = setupAccountsService(adminApp.firestore());
   const sessionService = setupSessionService(adminApp.auth());
+  const transactionsService = setupTransactionsService(adminApp.firestore());
 
   return {
     authenticationService,
@@ -37,6 +39,7 @@ module.exports = function () {
     rolesService,
     storageService,
     userService,
-    sessionService
+    sessionService,
+    transactionsService
   };
 };
