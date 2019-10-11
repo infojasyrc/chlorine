@@ -18,6 +18,13 @@ const setupTransactionsService = proxyquire('./../../database/transactions.servi
           message: '',
           responseCode: 200
         });
+      },
+      updateBalance: () => {
+        return Promise.resolve({
+          data: {},
+          responseCode: 200,
+          message: ''
+        });
       }
     }
   }

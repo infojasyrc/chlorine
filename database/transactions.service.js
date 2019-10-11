@@ -33,6 +33,17 @@ module.exports = function setupTransactionsService (dbInstance) {
         id: transactionRef.id,
         ...newTracsaction
       };
+
+      delete transactionCreated.accountId;
+      delete transactionCreated.userId;
+
+      const updatedAccountRef = await accountsService.updateBalance(
+        defaultAccountResponse.data.id,
+        transactionData.amount
+      );
+
+      transactionCreated.account = updatedAccountRef.data;
+
       baseService.returnData.message = 'Transaction registered successfully';
 
     } catch (err) {

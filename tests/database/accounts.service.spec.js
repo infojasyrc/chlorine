@@ -67,6 +67,26 @@ test.beforeEach(() => {
             }
           }
         }
+      },
+      doc: () => {
+        return {
+          get: () => {
+            return Promise.resolve({
+              id: 'thisIsAnAccountId',
+              data: () => {
+                return {
+                  name: 'Cuenta Corriente',
+                  default: true,
+                  balance: 2000000.00,
+                  userId: 'thisIsAUserId'
+                };
+              }
+            });
+          },
+          update: () => {
+            return Promise.resolve({});
+          }
+        }
       }
     });
 
@@ -102,5 +122,15 @@ test.serial('Get default account', async t => {
   t.true(defaultAccountResponse.data.hasOwnProperty('name'), 'Expected name property');
   t.true(defaultAccountResponse.data.hasOwnProperty('default'), 'Expected default property');
   t.true(defaultAccountResponse.data.default, 'Expected default account key as true');
+});
+
+test.serial('Update account by transaction amount', async t => {
+  const accountId = 'thisIsAnAccountId';
+  const transactionAmount = 200.00;
+
+  const accountResponse = await accountsService.updateBalance(accountId, transactionAmount);
+
+  t.true(accountResponse.hasOwnProperty('message'), 'Expected message key');
+  t.true(accountResponse.hasOwnProperty('data'), 'Expected data key');
 });
 

@@ -86,9 +86,38 @@ module.exports = function setupAccountsService (dbInstance) {
     return allAccountsResponse;
   }
 
+  async function updateBalance (accountId, transactionAmount) {
+    try {
+      const accountResponse = await collection.doc(accountId).get();
+      const accountData = accountResponse.data();
+
+      const updatedAccount = {
+        balance: accountData.balance - transactionAmount
+      };
+
+      await collection.doc(accountId).update(updatedAccount);
+
+      const updatedAccountResponse = await collection.doc(accountId).get();
+
+      baseService.returnData.message = 'Account was successfully updated';
+      baseService.returnData.data = {
+        accountId,
+        ...updatedAccountResponse.data()
+      };
+    } catch (err) {
+      const errorMessage = 'Error updating account balance';
+      console.error(errorMessage, err);
+      baseService.returnData.responseCode = 500;
+      baseService.returnData.message = errorMessage;
+    }
+
+    return baseService.returnData;
+  }
+
   return {
     checkBalance,
     getAll,
-    getDefaultAccount
+    getDefaultAccount,
+    updateBalance
   }
 }
