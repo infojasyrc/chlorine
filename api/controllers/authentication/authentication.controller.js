@@ -36,9 +36,7 @@ const login = async (request, response) => {
     responseData = baseController.getErrorResponse('Error logging in the application');
   }
 
-  return response
-    .status(responseCode)
-    .json(responseData);
+  return response.status(responseCode).json(responseData);
 };
 
 const logout = async (request, response) => {
