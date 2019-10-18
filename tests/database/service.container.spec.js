@@ -29,3 +29,10 @@ test.serial('Check transactions service', t => {
 
   t.true(transactionsService.hasOwnProperty('makeTransaction'), 'Expected makeTransaction property');
 });
+
+test.serial('Check auth code service', t => {
+  const service = serviceContainer('authCode');
+
+  t.true(service.hasOwnProperty('getAccessTokenByAuthCode'), 'Expected getAccessTokenByAuthCode property');
+  t.true(service.hasOwnProperty('getAccessTokenByRefreshToken'), 'Expected getAccessTokenByRefreshToken property');
+});

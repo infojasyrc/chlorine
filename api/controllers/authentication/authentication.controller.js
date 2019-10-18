@@ -6,15 +6,15 @@ const setupDBService = require('./../../../database');
 let baseController = new setupBaseController();
 const dbService = setupDBService();
 
+let responseCode;
+let responseData;
+
 const login = async (request, response) => {
   if (!request.body.email || !request.body.password) {
     return response
       .status(400)
       .json(baseController.getErrorResponse('Paramaters are missing'));
   }
-
-  let responseCode;
-  let responseData;
 
   try {
     let authenticationData = {
@@ -40,8 +40,6 @@ const login = async (request, response) => {
 };
 
 const logout = async (request, response) => {
-  let responseCode;
-  let responseData;
 
   try {
     let loginData = await dbService.authenticationService.logout();
@@ -69,9 +67,6 @@ const resetPassword = async (request, response) => {
       .json(baseController.getErrorResponse('Email parameter is missing'));
   }
 
-  let responseCode;
-  let responseData;
-
   try {
     let authenticationData = await dbService
       .authenticationService
@@ -93,12 +88,7 @@ const resetPassword = async (request, response) => {
     .json(responseData);
 };
 
-const getAccessTokenByAuthCode = async (request, response) => {
-
-};
-
 module.exports = {
-  getAccessTokenByAuthCode,
   login,
   logout,
   resetPassword

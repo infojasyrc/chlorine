@@ -10,7 +10,7 @@ const proxyquire = require('proxyquire');
 
 let sandbox = null;
 
-let roleController;
+let authenticationController;
 
 test.beforeEach(() => {
   sandbox = sinon.createSandbox();
@@ -20,9 +20,10 @@ test.afterEach(() => {
   sandbox && sandbox.restore();
 });
 
-function getSetupDBService(roleService) {
+function getSetupDBService(authenticationService, userService) {
   const firebaseApplication = {
-    auth: sinon.stub()
+    auth: sinon.stub(),
+    storage: sinon.stub()
   };
 
   const firebaseAdminApplication = {
@@ -35,15 +36,18 @@ function getSetupDBService(roleService) {
     }
   };
 
+  if (!userService) {
+    userService = {};
+  }
+
   return proxyquire('./../../../../database', {
     './firebase.application': () => firebaseApplication,
     './firebase-admin.application': () => firebaseAdminApplication,
-    './auth.codes.service': () => {},
-    './user.service': () => {},
+    './user.service': () => userService,
     './attendees.service': () => {},
     './events.service': () => {},
-    './authentication.service': () => {},
-    './roles.service': () => roleService,
+    './authentication.service': () => authenticationService,
+    './roles.service': () => {},
     './headquarters.service': () => {},
     './storage.service': () => {},
     './accounts.service': () => {},
@@ -52,53 +56,39 @@ function getSetupDBService(roleService) {
 }
 
 function getController(allServices) {
-  return proxyquire('./../../../../api/controllers/roles/role.controller', {
+  return proxyquire('./../../../../api/controllers/token/token.controller', {
     './../../../database': allServices
   });
 }
 
-test.serial('Get role information: validate params', async t => {
+test.serial('Access token: get access token ', async t => {
   const req = mockRequest({
     params: {}
   });
   const res = mockResponse();
 
-  let roleService = {};
-  const setupDBService = getSetupDBService(roleService);
+  const setupDBService = getSetupDBService(authenticationService, {});
 
-  roleController = getController(setupDBService);
+  authenticationController = getController(setupDBService);
 
-  await roleController.get(req, res);
+  await authenticationController.accessToken(req, res);
 
   t.true(res.status.called, 'Expected response status was executed');
-  t.true(res.status.calledWith(400), 'Expected response status with success response');
+  t.true(res.status.calledWith(200), 'Expected response status with success response');
   t.true(res.json.called, 'Expected response json was executed');
 });
 
-test.serial('Get role information: retrieve data', async t => {
+test.serial('Access token: get refresh token ', async t => {
   const req = mockRequest({
-    params: {
-      id: 'aaaaaaaaaa'
-    }
+    params: {}
   });
   const res = mockResponse();
 
-  let roleService = {};
-  roleService.getRole = sandbox.stub();
-  roleService
-    .getRole
-    .withArgs(req.params.id)
-    .returns(Promise.resolve({
-      responseCode: 200,
-      data: {},
-      message: ''
-    }));
+  const setupDBService = getSetupDBService(authenticationService, {});
 
-  const setupDBService = getSetupDBService(roleService);
+  authenticationController = getController(setupDBService);
 
-  roleController = getController(setupDBService);
-
-  await roleController.get(req, res);
+  await authenticationController.accessToken(req, res);
 
   t.true(res.status.called, 'Expected response status was executed');
   t.true(res.status.calledWith(200), 'Expected response status with success response');

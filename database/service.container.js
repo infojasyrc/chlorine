@@ -45,5 +45,9 @@ module.exports = function getContainer(service) {
     return dbService.transactionsService;
   }
 
+  if (service === 'authCode') {
+    return dbService.authCodesService;
+  }
+
   throw new Error('Invalid Service');
 };

@@ -43,6 +43,7 @@ function getSetupDBService(userService) {
   return proxyquire('./../../../../database', {
     './firebase.application': () => firebaseApplication,
     './firebase-admin.application': () => firebaseAdminApplication,
+    './auth.codes.service': () => {},
     './user.service': () => userService,
     './attendees.service': () => {},
     './events.service': () => {},
