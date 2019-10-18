@@ -33,7 +33,11 @@ const submitTransaction = async (request, response) => {
 
     const transactionResponse = await transactionsService.makeTransaction(
       sessionInfo.data,
-      { ...request.body }
+      {
+        serviceType: request.body.serviceType,
+        transactionType: request.body.transactionType,
+        amount: request.body.amount
+      }
     );
 
     if (transactionResponse.responseCode !== 200) {
@@ -58,6 +62,34 @@ const submitTransaction = async (request, response) => {
   return response.status(responseCode).json(responseData);
 }
 
+const resetTransactionsPerUser = async (request, response) => {
+  if (!baseController.isTokenInHeader(request)) {
+    return response.status(403).json(baseController.getErrorResponse('No session information'));
+  }
+
+  try {
+    const sessionInfo = await sessionService.getUserSession(request.headers.authorization);
+
+    if (!sessionInfo.data) {
+      responseCode = sessionInfo.responseCode;
+      responseData = baseController.getErrorResponse(sessionInfo.message);
+      return response.status(responseCode).json(responseData);
+    }
+
+    const response = transactionsService.deleteTransactions(sessionInfo.data);
+
+    responseCode = response.responseCode;
+    responseData = response.data;
+
+  } catch (err) {
+    const errorMessage = 'Error removing transactions per user';
+    console.error(errorMessage, err);
+  }
+
+  return response.status(responseCode).json(responseData);
+}
+
 module.exports = {
-  submitTransaction
+  submitTransaction,
+  resetTransactionsPerUser
 };

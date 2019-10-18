@@ -22,20 +22,18 @@ module.exports = function setupTransactionsService (dbInstance) {
         return baseService.returnData;
       }
 
-      const newTracsaction = {
+      const newTransaction = {
         userId,
         ...transactionData,
         accountId: defaultAccountResponse.data.id
       };
 
-      const transactionRef = await collection.add(newTracsaction);
+      const transactionRef = await collection.add(newTransaction);
+
       transactionCreated = {
         id: transactionRef.id,
-        ...newTracsaction
+        ...newTransaction
       };
-
-      delete transactionCreated.accountId;
-      delete transactionCreated.userId;
 
       const updatedAccountRef = await accountsService.updateBalance(
         defaultAccountResponse.data.id,
@@ -58,7 +56,29 @@ module.exports = function setupTransactionsService (dbInstance) {
     return baseService.returnData;
   }
 
+  async function deleteTransactions(userId) {
+    try {
+      const allTransactions = await collection.where('userId', '==', userId).get();
+
+      allTransactions.forEach(doc => {
+        collection.doc(doc.id).delete();
+      });
+
+      baseService.returnData.responseCode = 200;
+      baseService.returnData.message = 'Removed all transactions per user';
+
+    } catch (err) {
+      const errorMessage = 'Error removing all user transactions';
+      console.error(errorMessage, err);
+      baseService.returnData.responseCode = 500;
+      baseService.returnData.message = errorMessage;
+    }
+
+    return baseService.returnData;
+  }
+
   return {
+    deleteTransactions,
     makeTransaction
   };
 }
