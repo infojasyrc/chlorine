@@ -93,7 +93,12 @@ const resetPassword = async (request, response) => {
     .json(responseData);
 };
 
+const getAccessTokenByAuthCode = async (request, response) => {
+
+};
+
 module.exports = {
+  getAccessTokenByAuthCode,
   login,
   logout,
   resetPassword
