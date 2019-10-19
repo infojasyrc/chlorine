@@ -45,10 +45,7 @@ const logout = async (request, response) => {
     let loginData = await dbService.authenticationService.logout();
 
     responseCode = loginData.responseCode;
-    responseData = baseController.getSuccessResponse(
-      loginData.data,
-      loginData.message
-    );
+    responseData = baseController.getSuccessResponse({}, loginData.message);
   } catch (err) {
     responseCode = 500;
     console.error('Error logging out the app: ', err);
@@ -68,9 +65,7 @@ const resetPassword = async (request, response) => {
   }
 
   try {
-    let authenticationData = await dbService
-      .authenticationService
-      .resetPassword(request.body.email);
+    let authenticationData = await dbService.authenticationService.resetPassword(request.body.email);
 
     responseCode = authenticationData.responseCode;
     responseData = baseController.getSuccessResponse(

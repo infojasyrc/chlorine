@@ -86,13 +86,20 @@ module.exports = function setupAccountsService (dbInstance) {
     return allAccountsResponse;
   }
 
+  function calculateBalance(currentBalance, transactionAmount) {
+    return parseFloat(
+      parseFloat(currentBalance).toFixed(2) -
+      parseFloat(transactionAmount).toFixed(2)
+    ).toFixed(2);
+  }
+
   async function updateBalance (accountId, transactionAmount) {
     try {
       const accountResponse = await collection.doc(accountId).get();
       const accountData = accountResponse.data();
 
       const updatedAccount = {
-        balance: accountData.balance - transactionAmount
+        balance: calculateBalance(accountData.balance, transactionAmount)
       };
 
       await collection.doc(accountId).update(updatedAccount);
@@ -119,5 +126,5 @@ module.exports = function setupAccountsService (dbInstance) {
     getAll,
     getDefaultAccount,
     updateBalance
-  }
+  };
 }
