@@ -1,11 +1,29 @@
 'use strict';
 
 const test = require('ava');
+const proxyquire = require('proxyquire');
 
-const serviceContainer = require('./../../database/service.container');
+const serviceContainer = proxyquire('./../../database/service.container', {
+  './': () => {
+    return {
+      eventsService: {
+        create: () => {}
+      },
+      userService: {
+        create: () => {}
+      },
+      transactionsService: {
+        makeTransaction: () => {}
+      },
+      authCodesService: {
+        getAccessTokenByAuthCode: () => {},
+        getAccessTokenByRefreshToken: () => {}
+      }
+    };
+  }
+});
 
 test.beforeEach(() => {});
-
 
 test.serial('Check events service', t => {
   const eventService = serviceContainer('events');
