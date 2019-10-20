@@ -20,56 +20,38 @@ test.afterEach(() => {
   sandbox && sandbox.restore();
 });
 
-function getSetupDBService(authenticationService, userService) {
-  const firebaseApplication = {
-    auth: sinon.stub(),
-    storage: sinon.stub()
-  };
-
-  const firebaseAdminApplication = {
-    auth: sinon.stub(),
-    firestore: sinon.stub(),
-    storage: () => {
-      return {
-        bucket: () => {}
-      }
-    }
-  };
-
-  if (!userService) {
-    userService = {};
-  }
-
-  return proxyquire('./../../../../database', {
-    './firebase.application': () => firebaseApplication,
-    './firebase-admin.application': () => firebaseAdminApplication,
-    './user.service': () => userService,
-    './attendees.service': () => {},
-    './events.service': () => {},
-    './authentication.service': () => authenticationService,
-    './roles.service': () => {},
-    './headquarters.service': () => {},
-    './storage.service': () => {},
-    './accounts.service': () => {},
-    './transactions.service': () => {}
-  });
-}
-
-function getController(allServices) {
+function getController() {
   return proxyquire('./../../../../api/controllers/token/token.controller', {
-    './../../../database': allServices
+    './../../../database/service.container': () => {
+      return {
+        getAccessTokenByAuthCode: () => {
+          return Promise.resolve({
+            responseCode: 200,
+            data: {}
+          });
+        },
+        getAccessTokenByRefreshToken: () => {
+          return Promise.resolve({
+            responseCode: 200,
+            data: {}
+          });
+        }
+      };
+    }
   });
 }
 
 test.serial('Access token: get access token ', async t => {
   const req = mockRequest({
-    params: {}
+    params: {},
+    body: {
+      grant_type: 'authorization_code',
+      code: 'thisIsACode'
+    }
   });
   const res = mockResponse();
 
-  const setupDBService = getSetupDBService(authenticationService, {});
-
-  authenticationController = getController(setupDBService);
+  authenticationController = getController();
 
   await authenticationController.accessToken(req, res);
 
@@ -80,13 +62,15 @@ test.serial('Access token: get access token ', async t => {
 
 test.serial('Access token: get refresh token ', async t => {
   const req = mockRequest({
-    params: {}
+    params: {},
+    body: {
+      grant_type: 'refresh_token',
+      refresh_token: 'thisIsAToken'
+    }
   });
   const res = mockResponse();
 
-  const setupDBService = getSetupDBService(authenticationService, {});
-
-  authenticationController = getController(setupDBService);
+  authenticationController = getController();
 
   await authenticationController.accessToken(req, res);
 

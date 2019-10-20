@@ -5,9 +5,6 @@ const app = require('express')();
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const fileParser = require('express-multipart-file-parser');
-const setupDBService = require('./database/');
-
-const dbService = setupDBService();
 
 global.XMLHttpRequest = require('xhr2');
 
@@ -19,9 +16,15 @@ app.use(function (request, response, next) {
   next();
 });
 
+function checkPublicUrls(request) {
+  return request.path.includes('/api/authenticate') ||
+    request.path.includes('/api/events') ||
+    request.path.includes('/api/token/access-token');
+}
+
 app.use(async(request, response, next) => {
 
-  if (request.path.includes('/api/authenticate') || request.path.includes('/api/events')) {
+  if (checkPublicUrls(request)) {
     next();
     return;
   }
@@ -29,18 +32,14 @@ app.use(async(request, response, next) => {
   const token = request.headers['authorization'];
 
   if (!token) {
-    response
-      .status(401)
-      .json({status: '401', message: 'Unauthorized', data: {}});
+    response.status(401).json({status: '401', message: 'Unauthorized', data: {}});
     return;
   }
 
   try {
     next();
   } catch (error) {
-    response
-      .status(500)
-      .json({status: '500', message: 'Error while verifying token', data: {}});
+    response.status(500).json({status: '500', message: 'Error while verifying token', data: {}});
   }
 });
 

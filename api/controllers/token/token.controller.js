@@ -1,24 +1,38 @@
 'use strict';
 
-const setupBaseController = require('./../base.controller');
 const serviceContainer = require('./../../../database/service.container');
 
-let baseController = new setupBaseController();
 const dbService = serviceContainer('authCode');
 
-let responseCode;
-let responseData;
+const authorizationCodeGrantType = 'authorization_code';
+const refreshTokenGrantType = 'refresh_token';
+
+const handleAuthorizationCodeGrantType = async (request) => {
+  if (!request.body.code) {
+    return {responseCode: 404, data: {}};
+  }
+  return await dbService.getAccessTokenByAuthCode(request.body.code);
+};
+
+const handleRefreshTokenGrantType = async (request) => {
+  if (!request.body.refresh_token) {
+    return {responseCode: 404, data: {}};;
+  }
+  return await dbService.getAccessTokenByRefreshToken(request.body.refresh_token);
+};
 
 const accessToken = async (request, response) => {
-  if (request.body.gran_type === 'authorization_code') {
-    return dbService.getAccessTokenByAuthCode(request.body.code);
-  } else if (request.body.gran_type === 'refresh_token') {
-    return dbService.getAccessTokenByRefreshToken(request.body.refresh_token);
-  } else {
-    return response.send(404);
+  if (request.body.grant_type === authorizationCodeGrantType) {
+    const responseData = await handleAuthorizationCodeGrantType(request);
+    return response.status(responseData.responseCode).json(responseData.data);
   }
 
-  return response.status(responseCode).json(responseData);
+  if (request.body.grant_type === refreshTokenGrantType) {
+    const responseData = await handleRefreshTokenGrantType(request);
+    return response.status(responseData.responseCode).json(responseData.data);
+  }
+
+  return response.status(404).json({});
 };
 
 module.exports = {
