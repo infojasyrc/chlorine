@@ -125,6 +125,7 @@ module.exports = function setupAuthenticationService(clientAdminInstance, adminI
     return baseService.returnData;
   }
 
+  // TODO: change to revocation token to implement sign out
   async function logout() {
     try {
       await clientAuth.signOut();

@@ -31,7 +31,10 @@ test.beforeEach(() => {
       },
       doc: () => {
         return {
-          update: () => {}
+          update: () => {},
+          set: () => {
+            return Promise.resolve({});
+          }
         }
       }
     });
@@ -67,4 +70,12 @@ test.serial('Get access token by refresh token', async t => {
   t.true(response.data.hasOwnProperty('refresh_token'), 'Expected refresh_token key');
   t.true(response.data.hasOwnProperty('expires_in'), 'Expected expires_in key');
   t.true(response.data.hasOwnProperty('id_token'), 'Expected id_token key');
+});
+
+test.serial('Add authorization code', async t => {
+  const userId = 'thisIsAUserId';
+  const response = await authCodesService.addAuthCode(userId);
+
+  t.true(response.hasOwnProperty('message'), 'Expected message key');
+  t.true(response.hasOwnProperty('data'), 'Expected data key');
 });

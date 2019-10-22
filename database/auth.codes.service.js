@@ -1,7 +1,9 @@
 'use strict';
 
-const setupBaseService = require('./base.service');
 const uuidGenerator = require('uuid/v4');
+const FieldValue = require('firebase-admin').firestore.FieldValue;
+
+const setupBaseService = require('./base.service');
 
 module.exports = function setupAuthCodesService(adminInstance, dbInstance) {
 
@@ -33,6 +35,30 @@ module.exports = function setupAuthCodesService(adminInstance, dbInstance) {
       'expires_in': expiresIn,
       'id_token': ''
     };
+  }
+
+  async function addAuthCode(userId) {
+    let response = {};
+    const newAuthCode = {
+      code: uuidGenerator(),
+      userId: userId,
+      created: FieldValue.serverTimestamp()
+    };
+
+    try {
+      await collection.doc(userId).set(newAuthCode, {merge: true});
+
+      response = baseService.getSuccessResponse(
+        newAuthCode,
+        'Adding authorization code successfully'
+      );
+    } catch (err) {
+      const errorMessage = 'Error adding authorization code';
+      console.error(errorMessage, err);
+      response = baseService.getErrorResponse(errorMessage);
+    }
+
+    return response;
   }
 
   async function getAccessTokenByAuthCode(code) {
@@ -105,6 +131,7 @@ module.exports = function setupAuthCodesService(adminInstance, dbInstance) {
   }
 
   return {
+    addAuthCode,
     getAccessTokenByAuthCode,
     getAccessTokenByRefreshToken
   };
