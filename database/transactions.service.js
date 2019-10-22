@@ -1,5 +1,7 @@
 'use service';
 
+const FieldValue = require('firebase-admin').firestore.FieldValue;
+
 const setupBaseService = require('./base.service');
 const setupAccountsService = require('./accounts.service');
 
@@ -25,7 +27,8 @@ module.exports = function setupTransactionsService (dbInstance) {
       const newTransaction = {
         userId,
         ...transactionData,
-        accountId: defaultAccountResponse.data.id
+        accountId: defaultAccountResponse.data.id,
+        created: FieldValue.serverTimestamp()
       };
 
       const transactionRef = await collection.add(newTransaction);

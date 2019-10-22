@@ -20,45 +20,54 @@ test.afterEach(() => {
   sandbox && sandbox.restore();
 });
 
-function getSetupDBService(authenticationService, userService) {
-  const firebaseApplication = {
-    auth: sinon.stub(),
-    storage: sinon.stub()
-  };
-
-  const firebaseAdminApplication = {
-    auth: sinon.stub(),
-    firestore: sinon.stub(),
-    storage: () => {
-      return {
-        bucket: () => {}
-      }
-    }
-  };
-
-  if (!userService) {
-    userService = {};
-  }
-
-  return proxyquire('./../../../../database', {
-    './firebase.application': () => firebaseApplication,
-    './firebase-admin.application': () => firebaseAdminApplication,
-    './auth.codes.service': () => {},
-    './user.service': () => userService,
-    './attendees.service': () => {},
-    './events.service': () => {},
-    './authentication.service': () => authenticationService,
-    './roles.service': () => {},
-    './headquarters.service': () => {},
-    './storage.service': () => {},
-    './accounts.service': () => {},
-    './transactions.service': () => {}
-  });
-}
-
 function getController(allServices) {
   return proxyquire('./../../../../api/controllers/authentication/authentication.controller', {
-    './../../../database': allServices
+    './../../../database/service.container': (service) => {
+      switch(service) {
+        default:
+        case 'authentication':
+          return {
+            login: () => {
+              return Promise.resolve({
+                responseCode: 200,
+                data: {
+                  uid: 'abcdefg'
+                },
+                message: ''
+              });
+            },
+            logout: () => {
+              return Promise.resolve({
+                responseCode: 200,
+                data: {}
+              });
+            }
+          };
+        case 'users':
+          return {
+            findByUserId: () => {
+              return Promise.resolve({
+                responseCode: 200,
+                data: {},
+                message: ''
+              });
+            }
+          };
+        case 'authCode':
+          return {
+            addAuthCode: () => {
+              return Promise.resolve({
+                responseCode: 200,
+                data: {
+                  userId: 'thisIsAUserId',
+                  code: 'thisIsAnAuthCode',
+                  created: Date()
+                }
+              });
+            }
+          };
+      }
+    }
   });
 }
 
@@ -68,10 +77,7 @@ test.serial('Login: validate parameters', async t => {
   });
   const res = mockResponse();
 
-  let authenticationService = {};
-  const setupDBService = getSetupDBService(authenticationService, {});
-
-  authenticationController = getController(setupDBService);
+  authenticationController = getController();
 
   await authenticationController.login(req, res);
 
@@ -90,43 +96,14 @@ test.serial('Login: Get user information', async t => {
   });
   const res = mockResponse();
 
-  let authenticationService = {};
-  authenticationService.login = sandbox.stub();
-  authenticationService
-    .login
-    .withArgs({
-      email: req.body.email,
-      password: req.body.password
-    })
-    .returns(Promise.resolve({
-      responseCode: 200,
-      data: {
-        uid: 'abcdefg'
-      },
-      message: ''
-    }));
-
-  let userService = {};
-  userService.findByUserId = sandbox.stub();
-  userService
-    .findByUserId
-    .returns(
-      Promise.resolve({
-        responseCode: 200,
-        data: {},
-        message: ''
-      })
-    );
-
-  const setupDBService = getSetupDBService(authenticationService, userService);
-
-  authenticationController = getController(setupDBService);
+  authenticationController = getController();
 
   await authenticationController.login(req, res);
 
   t.true(res.status.called, 'Expected response status was executed');
   t.true(res.status.calledWith(200), 'Expected response status with success response');
   t.true(res.json.called, 'Expected response json was executed');
+  console.log(res.json.calledWith());
 });
 
 test.serial('Logout', async t => {
@@ -135,20 +112,7 @@ test.serial('Logout', async t => {
   });
   const res = mockResponse();
 
-  let authenticationService = {};
-  authenticationService.logout = sandbox.stub();
-  authenticationService
-    .logout
-    .returns(
-      Promise.resolve({
-        responseCode: 200,
-        data: {},
-        message: ''
-      }));
-
-  const setupDBService = getSetupDBService(authenticationService, {});
-
-  authenticationController = getController(setupDBService);
+  authenticationController = getController();
 
   await authenticationController.logout(req, res);
 

@@ -1,10 +1,12 @@
 'use strict';
 
 const setupBaseController = require('./../base.controller');
-const setupDBService = require('./../../../database');
+const serviceContainer = require('./../../../database/service.container');
 
 let baseController = new setupBaseController();
-const dbService = setupDBService();
+const authenticationService = serviceContainer('authentication');
+const userService = serviceContainer('users');
+const authCodesService = serviceContainer('authCode');
 
 let responseCode;
 let responseData;
@@ -22,11 +24,12 @@ const login = async (request, response) => {
       password: request.body.password
     };
 
-    let loginData = await dbService.authenticationService.login(authenticationData);
-
-    const user = await dbService.userService.findByUserId(loginData.data.uid);
+    let loginData = await authenticationService.login(authenticationData);
+    const authCodeInfo = await authCodesService.addAuthCode(loginData.data.uid);
+    const user = await userService.findByUserId(loginData.data.uid);
 
     loginData.data.user = user.data;
+    loginData.data.code = authCodeInfo.data.code;
 
     responseCode = loginData.responseCode;
     responseData = baseController.getSuccessResponse(loginData.data, loginData.message);
@@ -42,7 +45,7 @@ const login = async (request, response) => {
 const logout = async (request, response) => {
 
   try {
-    let loginData = await dbService.authenticationService.logout();
+    let loginData = await authenticationService.logout();
 
     responseCode = loginData.responseCode;
     responseData = baseController.getSuccessResponse({}, loginData.message);
@@ -52,9 +55,7 @@ const logout = async (request, response) => {
     responseData = baseController.getErrorResponse('Error logging out the app');
   }
 
-  return response
-    .status(responseCode)
-    .json(responseData);
+  return response.status(responseCode).json(responseData);
 };
 
 const resetPassword = async (request, response) => {
@@ -65,7 +66,7 @@ const resetPassword = async (request, response) => {
   }
 
   try {
-    let authenticationData = await dbService.authenticationService.resetPassword(request.body.email);
+    let authenticationData = await authenticationService.resetPassword(request.body.email);
 
     responseCode = authenticationData.responseCode;
     responseData = baseController.getSuccessResponse(
@@ -78,9 +79,7 @@ const resetPassword = async (request, response) => {
     responseData = baseController.getErrorResponse('Error resetting password');
   }
 
-  return response
-    .status(responseCode)
-    .json(responseData);
+  return response.status(responseCode).json(responseData);
 };
 
 module.exports = {
