@@ -3,12 +3,12 @@
 const uuidGenerator = require('uuid/v4');
 const FieldValue = require('firebase-admin').firestore.FieldValue;
 
-const setupBaseService = require('./base.service');
+const BaseService = require('./base.service');
 
 module.exports = function setupAuthCodesService(adminInstance, dbInstance) {
 
   const collection = dbInstance.collection('auth_codes');
-  const baseService = new setupBaseService();
+  const baseService = new BaseService();
 
   async function filterBy(filterBy) {
     return await collection.where(filterBy.key, '==', filterBy.value).get();

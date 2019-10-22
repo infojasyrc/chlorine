@@ -28,6 +28,7 @@ module.exports = function setupAuthenticationService(clientAdminInstance, adminI
   }
 
   async function login(data) {
+    let response = {};
     let loginData = {
       uid: '',
       token: ''
@@ -37,19 +38,21 @@ module.exports = function setupAuthenticationService(clientAdminInstance, adminI
       await clientAuth.signInWithEmailAndPassword(data.email, data.password);
 
       loginData.uid = clientAuth.currentUser.uid;
-      loginData.token = await clientAuth
-        .currentUser
-        .getIdToken(true);
+      loginData.token = await clientAuth.currentUser.getIdToken(true);
 
-      baseService.returnData.message = 'Login successful';
+      response = baseService.getSuccessResponse(
+        loginData,
+        'Login successful'
+      );
     } catch (err) {
-      console.error('Error in login: ', err);
-      baseService.returnData.message = 'Error in login: ' + getSpecificErrorMessage(err.code);
-    } finally {
-      baseService.returnData.data = loginData;
+      const errorMessage = 'Error in login: ';
+      console.error(errorMessage, err);
+      response = baseService.getErrorResponse(
+        errorMessage + getSpecificErrorMessage(err.code)
+      );
     }
 
-    return baseService.returnData;
+    return response;
   }
 
   async function checkLogin(email, password) {
