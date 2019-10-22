@@ -2,30 +2,12 @@
 
 const test = require('ava');
 const sinon = require('sinon');
-const proxyquire = require('proxyquire');
 
-const setupAuthenticationService = proxyquire('./../../database/authentication.service', {
-  './auth.codes.service': () => {
-    return {
-      addAuthCode: () => {
-        return Promise.resolve({
-          responseCode: 200,
-          data: {
-            code: 'thisIsACode',
-            userId: 'thisIsAUserId'
-          },
-          message: '',
-          status: true
-        });
-      }
-    };
-  }
-});
+const setupAuthenticationService = require('./../../database/authentication.service');
 
 let authenticationService;
 let clientAdminInstanceStub;
 let adminInstanceStub;
-let dbInstanceStub;
 let sandbox = null;
 
 test.beforeEach(() => {
@@ -33,7 +15,6 @@ test.beforeEach(() => {
 
   clientAdminInstanceStub = {};
   adminInstanceStub = {};
-  dbInstanceStub = {};
 
   clientAdminInstanceStub.signInWithEmailAndPassword = sandbox.stub();
   clientAdminInstanceStub
@@ -86,8 +67,7 @@ test.serial('Login', async t => {
 
   authenticationService = setupAuthenticationService(
     clientAdminInstanceStub,
-    adminInstanceStub,
-    dbInstanceStub
+    adminInstanceStub
   );
 
   let authenticationResponse = await authenticationService.login(data);
@@ -101,8 +81,7 @@ test.serial('Check credentials for login', async t => {
 
   authenticationService = setupAuthenticationService(
     clientAdminInstanceStub,
-    adminInstanceStub,
-    dbInstanceStub
+    adminInstanceStub
   );
 
   let loginResult = await authenticationService.checkLogin(password);
@@ -115,8 +94,7 @@ test.serial('Change login password', async t => {
 
   authenticationService = setupAuthenticationService(
     clientAdminInstanceStub,
-    adminInstanceStub,
-    dbInstanceStub
+    adminInstanceStub
   );
 
   let processData = await authenticationService.changePassword(password);
@@ -128,8 +106,7 @@ test.serial('Reset password', async t => {
 
   authenticationService = setupAuthenticationService(
     clientAdminInstanceStub,
-    adminInstanceStub,
-    dbInstanceStub
+    adminInstanceStub
   );
 
   const result = await authenticationService.resetPassword(emailTest);
@@ -157,8 +134,7 @@ test.serial('Change password using admin sdk: success response', async t => {
 
   authenticationService = setupAuthenticationService(
     clientAdminInstanceStub,
-    adminInstanceStub,
-    dbInstanceStub
+    adminInstanceStub
   );
 
   const result = await authenticationService.changePasswordUsingAdminSDK(
@@ -183,8 +159,7 @@ test.serial('Change password using admin sdk: error response', async t => {
 
   authenticationService = setupAuthenticationService(
     clientAdminInstanceStub,
-    adminInstanceStub,
-    dbInstanceStub
+    adminInstanceStub
   );
 
   const result = await authenticationService.changePasswordUsingAdminSDK(
@@ -201,8 +176,7 @@ test.serial('Change password using admin sdk: error response', async t => {
 test.serial('Logout', async t => {
   authenticationService = setupAuthenticationService(
     clientAdminInstanceStub,
-    adminInstanceStub,
-    dbInstanceStub
+    adminInstanceStub
   );
 
   const authenticationResponse = await authenticationService.logout();

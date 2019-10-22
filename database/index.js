@@ -20,11 +20,7 @@ module.exports = function () {
   const firebase = setupFirebaseApplication();
   const adminApp = setupFirebaseAdminApplication();
 
-  const authenticationService = setupAuthenticationService(
-    firebase.auth(),
-    adminApp.auth(),
-    adminApp.firestore()
-  );
+  const authenticationService = setupAuthenticationService(firebase.auth(), adminApp.auth());
   const userService = setupUserService(adminApp.auth(), adminApp.firestore());
   const attendeesService = setupAttendeesService(adminApp.firestore());
   const eventsService = setupEventsService(adminApp.firestore());
