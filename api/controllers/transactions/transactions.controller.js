@@ -11,8 +11,7 @@ let responseCode;
 let responseData;
 
 const submitTransaction = async (request, response) => {
-  if (!request.body.serviceType ||
-    !request.body.transactionType ||
+  if (!request.body.transactionType ||
     !request.body.amount
   ) {
     return response.status(400).json(baseController.getErrorResponse('Parameters are missing'));
@@ -20,6 +19,10 @@ const submitTransaction = async (request, response) => {
   // Access forbidden
   if (!baseController.isTokenInHeader(request)) {
     return response.status(403).json(baseController.getErrorResponse('No session information'));
+  }
+
+  if (!transactionsService.validateDataByTransactionType(request.body)) {
+    return response.status(400).json(baseController.getErrorResponse('Parameters are missing'));
   }
 
   try {
@@ -31,13 +34,11 @@ const submitTransaction = async (request, response) => {
       return response.status(responseCode).json(responseData);
     }
 
+    const transactionData = transactionsService.formatTransactionDataFromRequest(request.body);
+
     const transactionResponse = await transactionsService.makeTransaction(
       sessionInfo.data,
-      {
-        serviceType: request.body.serviceType,
-        transactionType: request.body.transactionType,
-        amount: request.body.amount
-      }
+      transactionData
     );
 
     if (transactionResponse.responseCode !== 200) {

@@ -10,6 +10,8 @@ module.exports = function setupTransactionsService (dbInstance) {
   const accountsService = setupAccountsService(dbInstance);
   const collection = dbInstance.collection('payments');
   const baseService = new setupBaseService();
+  const paymentTransactionType = 'payment';
+  const transferTransactionType = 'transfer';
 
   async function makeTransaction (userId, transactionData) {
     let transactionCreated = null;
@@ -80,8 +82,62 @@ module.exports = function setupTransactionsService (dbInstance) {
     return baseService.returnData;
   }
 
+  function formatTransactionDataFromRequest(data) {
+    if (isPayment(data.transactionType)) {
+      return {
+        serviceType: data.serviceType,
+        transactionType: data.transactionType,
+        amount: data.amount
+      }
+    }
+
+    return {
+      account: data.account,
+      transactionType: data.transactionType,
+      amount: data.amount
+    };
+  }
+
+  function isServiceTypeAvailable(transactionDataRequest) {
+    return transactionDataRequest.serviceType &&
+      transactionDataRequest.serviceType.length > 0;
+  }
+
+  function isTransfer(transactionType) {
+    return transactionType === transferTransactionType;
+  }
+
+  function isPayment(transactionType) {
+    return transactionType === paymentTransactionType;
+  }
+
+  function isAccountDataAvailable(transactionDataRequest) {
+    return transactionDataRequest.account &&
+      transactionDataRequest.account.name &&
+      transactionDataRequest.account.name.length > 0 &&
+      transactionDataRequest.account.accountNumber &&
+      transactionDataRequest.account.accountNumber.length > 0 &&
+      transactionDataRequest.account.phoneNumber &&
+      transactionDataRequest.account.phoneNumber.length > 0;
+  }
+
+  function validateDataByTransactionType(transactionDataRequest) {
+    switch(transactionDataRequest.transactionType) {
+      case paymentTransactionType:
+        return isServiceTypeAvailable(transactionDataRequest);
+      case transferTransactionType:
+        return isAccountDataAvailable(transactionDataRequest);
+      default:
+        return false;
+    }
+  }
+
   return {
     deleteTransactions,
-    makeTransaction
+    makeTransaction,
+    formatTransactionDataFromRequest,
+    isPayment,
+    isTransfer,
+    validateDataByTransactionType
   };
 }

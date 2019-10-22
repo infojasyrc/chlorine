@@ -39,12 +39,21 @@ function getController() {
           };
         case 'transactions':
           return {
+            formatTransactionDataFromRequest: (data) => {
+              return {
+                amount: data.amount,
+                transactionType: data.transactionType
+              }
+            },
             makeTransaction: () => {
               return Promise.resolve({
                 data: transactionDataResponse,
                 responseCode: 200,
                 message: 'Getting transaction data successfully'
               });
+            },
+            validateDataByTransactionType: () => {
+              return true;
             }
           };
       }

@@ -72,3 +72,54 @@ test.serial('Pay service', async t => {
   t.true(paymentInfo.data.hasOwnProperty('serviceType'), 'Expected data key');
   t.true(paymentInfo.data.hasOwnProperty('amount'), 'Expected data key');
 });
+
+test.skip('Validate data according transaction type: not valid for payment', t => {
+  const transactionData = {
+    transactionType: 'payment',
+    amount: 120.00
+  };
+  const result = transactionsService.validateDataByTransactionType(transactionData);
+
+  t.false(result, 'Expected not valid data for payment');
+});
+
+test.serial('Validate data according transaction type: valid for payment', t => {
+  const transactionData = {
+    transactionType: 'payment',
+    amount: 120.00,
+    serviceType: 'Electricity'
+  };
+  const result = transactionsService.validateDataByTransactionType(transactionData);
+
+  t.true(result, 'Expected valid data for payment');
+});
+
+test.skip('Validate data according transaction type: not valid for transfer', t => {
+  const transactionData = {
+    transactionType: 'transfer',
+    amount: 120.00,
+    account: {
+      name: 'Juan Perez',
+      accountNumber: '',
+      phoneNumber: ''
+    }
+  };
+  const result = transactionsService.validateDataByTransactionType(transactionData);
+
+  t.false(result, 'Expected not valid data for transfer');
+});
+
+test.serial('Validate data according transaction type: valid for transfer', t => {
+  const transactionData = {
+    transactionType: 'transfer',
+    amount: 120.00,
+    account: {
+      name: 'Juan Perez',
+      accountNumber: '4646-2222-3455-3323',
+      phoneNumber: '989988999'
+    }
+  };
+  const result = transactionsService.validateDataByTransactionType(transactionData);
+
+  t.true(result, 'Expected valid data for transfer');
+});
