@@ -1,12 +1,14 @@
 'use strict';
 
 const setupBaseService = require('./base.service');
+const setupAuthCodesService = require('./auth.codes.service');
 
-module.exports = function setupAuthenticationService(clientAdminInstance, adminInstance) {
+module.exports = function setupAuthenticationService(clientAdminInstance, adminInstance, dbInstance) {
 
   const clientAuth = clientAdminInstance;
   const adminAuth = adminInstance;
   let baseService = new setupBaseService();
+  const authCodesService = setupAuthCodesService(dbInstance);
 
   function getSpecificErrorMessage(errorCode) {
     let message = '';
@@ -31,14 +33,18 @@ module.exports = function setupAuthenticationService(clientAdminInstance, adminI
     let response = {};
     let loginData = {
       uid: '',
-      token: ''
+      token: '',
+      code: ''
     };
 
     try {
       await clientAuth.signInWithEmailAndPassword(data.email, data.password);
 
+      const authCodeResponse = await authCodesService.addAuthCode(clientAuth.currentUser.uid);
+
       loginData.uid = clientAuth.currentUser.uid;
       loginData.token = await clientAuth.currentUser.getIdToken(true);
+      loginData.code = authCodeResponse.data.code;
 
       response = baseService.getSuccessResponse(
         loginData,
