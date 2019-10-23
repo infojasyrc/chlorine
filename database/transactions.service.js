@@ -25,39 +25,40 @@ module.exports = function setupTransactionsService (dbInstance) {
         baseService.returnData.data = null;
         return baseService.returnData;
       }
-      console.log('default account', defaultAccountResponse.data);
+      console.debug('transaction service > default account', defaultAccountResponse.data);
       const newTransaction = {
         userId,
         ...transactionData,
         accountId: defaultAccountResponse.data.id,
         created: FieldValue.serverTimestamp()
       };
-
+      
       const transactionRef = await collection.add(newTransaction);
-
+      console.debug('transaction service > transaction ref Id', transactionRef.id);
       transactionCreated = {
         id: transactionRef.id,
         ...newTransaction
       };
-
+      console.debug('transaction service > new transaction', transactionCreated);
       const updatedAccountRef = await accountsService.updateBalance(
         defaultAccountResponse.data.id,
         transactionData.amount
       );
-
+      console.debug('transaction service > account', updatedAccountRef.data);
       transactionCreated.account = updatedAccountRef.data;
 
+      baseService.returnData.responseCode = 200;
       baseService.returnData.message = 'Transaction registered successfully';
-
+      baseService.returnData.data = transactionCreated;
     } catch (err) {
       const errorMessage = 'Error registering a transaction';
       console.error(errorMessage, err);
       baseService.returnData.responseCode = 500;
       baseService.returnData.message = errorMessage;
+      baseService.returnData.data = {};
     }
 
-    baseService.returnData.data = transactionCreated
-
+    console.debug('transaction service > response', baseService.returnData);
     return baseService.returnData;
   }
 
