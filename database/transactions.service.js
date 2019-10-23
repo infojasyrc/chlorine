@@ -8,7 +8,7 @@ const setupAccountsService = require('./accounts.service');
 module.exports = function setupTransactionsService (dbInstance) {
 
   const accountsService = setupAccountsService(dbInstance);
-  const collection = dbInstance.collection('payments');
+  const collection = dbInstance.collection('transactions');
   const baseService = new setupBaseService();
   const paymentTransactionType = 'payment';
   const transferTransactionType = 'transfer';
@@ -25,7 +25,7 @@ module.exports = function setupTransactionsService (dbInstance) {
         baseService.returnData.data = null;
         return baseService.returnData;
       }
-
+      console.log('default account', defaultAccountResponse.data);
       const newTransaction = {
         userId,
         ...transactionData,
