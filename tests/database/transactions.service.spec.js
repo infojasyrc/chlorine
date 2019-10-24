@@ -30,7 +30,7 @@ const setupTransactionsService = proxyquire('./../../database/transactions.servi
   }
 });
 
-const collectionKey = 'payments';
+const collectionKey = 'transactions';
 let sandbox = null;
 const dbInstanceStub = {};
 let transactionsService;
