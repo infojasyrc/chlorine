@@ -25,7 +25,7 @@ module.exports = function setupTransactionsService (dbInstance) {
         baseService.returnData.data = null;
         return baseService.returnData;
       }
-      console.debug('transaction service > default account', defaultAccountResponse.data);
+
       const newTransaction = {
         userId,
         ...transactionData,
@@ -34,17 +34,17 @@ module.exports = function setupTransactionsService (dbInstance) {
       };
       
       const transactionRef = await collection.add(newTransaction);
-      console.debug('transaction service > transaction ref Id', transactionRef.id);
+
       transactionCreated = {
         id: transactionRef.id,
         ...newTransaction
       };
-      console.debug('transaction service > new transaction', transactionCreated);
+
       const updatedAccountRef = await accountsService.updateBalance(
         defaultAccountResponse.data.id,
         transactionData.amount
       );
-      console.debug('transaction service > account', updatedAccountRef.data);
+
       transactionCreated.account = updatedAccountRef.data;
 
       baseService.returnData.responseCode = 200;
@@ -58,7 +58,6 @@ module.exports = function setupTransactionsService (dbInstance) {
       baseService.returnData.data = {};
     }
 
-    console.debug('transaction service > response', baseService.returnData);
     return baseService.returnData;
   }
 

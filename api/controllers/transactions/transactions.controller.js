@@ -40,7 +40,7 @@ const submitTransaction = async (request, response) => {
       sessionInfo.data,
       transactionData
     );
-    console.debug('transaction controller > transaction response', transactionResponse);
+
     if (transactionResponse.responseCode !== 200) {
       responseCode = transactionResponse.responseCode;
       responseData = baseController.getErrorResponse(transactionResponse.message);
