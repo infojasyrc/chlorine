@@ -13,9 +13,7 @@ let responseData;
 
 const login = async (request, response) => {
   if (!request.body.email || !request.body.password) {
-    return response
-      .status(400)
-      .json(baseController.getErrorResponse('Paramaters are missing'));
+    return response.status(400).json(baseController.getErrorResponse('Paramaters are missing'));
   }
 
   try {
@@ -43,16 +41,27 @@ const login = async (request, response) => {
 };
 
 const logout = async (request, response) => {
+  if (!baseController.isTokenInHeader(request)) {
+    return response.status(400).json(baseController.getErrorResponse('No session information'));
+  }
 
   try {
-    let loginData = await authenticationService.logout();
+    const sessionService = serviceContainer('session');
+    const sessionInfo = await sessionService.getUserSession(request.headers.authorization);
+
+    if (!sessionInfo.data) {
+      return response.status(sessionInfo.responseCode).json({message: sessionInfo.message});
+    }
+    
+    let loginData = await authenticationService.logout(sessionInfo.data);
 
     responseCode = loginData.responseCode;
-    responseData = baseController.getSuccessResponse({}, loginData.message);
+    responseData = baseController.getSuccessResponse({timeStamp: loginData.data}, loginData.message);
   } catch (err) {
     responseCode = 500;
-    console.error('Error logging out the app: ', err);
-    responseData = baseController.getErrorResponse('Error logging out the app');
+    const errorMessage = 'Error logging out the app';
+    console.error(errorMessage, err);
+    responseData = baseController.getErrorResponse(errorMessage);
   }
 
   return response.status(responseCode).json(responseData);
@@ -60,9 +69,7 @@ const logout = async (request, response) => {
 
 const resetPassword = async (request, response) => {
   if (!request.body.email) {
-    return response
-      .status(400)
-      .json(baseController.getErrorResponse('Email parameter is missing'));
+    return response.status(400).json(baseController.getErrorResponse('Email parameter is missing'));
   }
 
   try {
