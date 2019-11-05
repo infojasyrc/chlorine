@@ -6,7 +6,7 @@ module.exports = function setupAuthenticationService(clientAdminInstance, adminI
 
   const clientAuth = clientAdminInstance;
   const adminAuth = adminInstance;
-  let baseService = new setupBaseService();
+  const baseService = new setupBaseService();
 
   function getSpecificErrorMessage(errorCode) {
     let message = '';
@@ -128,15 +128,14 @@ module.exports = function setupAuthenticationService(clientAdminInstance, adminI
     return baseService.returnData;
   }
 
-  // TODO: change to revocation token to implement sign out
   async function logout(userId) {
     try {
       await adminInstance.revokeRefreshTokens(userId);
       const userRecord = await adminAuth.getUser(userId);
       const revokeTimeStamp = new Date(userRecord.tokensValidAfterTime).getTime() / 1000;
-
+      console.info('revoke time', revokeTimeStamp);
       baseService.returnData.message = 'Sign out successfully';
-      baseService.returnData.data = revokeTimeStamp;
+      baseService.returnData.data = {};
     } catch (err) {
       console.error('Error sign out: ', err);
       baseService.returnData.message = 'Error sign out';

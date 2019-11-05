@@ -24,6 +24,13 @@ test.beforeEach(() => {
     .returns(Promise.resolve({
       tokensValidAfterTime: new Date().toISOString()
     }));
+  adminInstanceStub.ref = sandbox.stub();
+  adminInstanceStub.ref
+    .returns({
+      set: () => {
+        return Promise.resolve({});
+      }
+    });
 
   clientInstanceStub.signInWithEmailAndPassword = sandbox.stub();
   clientInstanceStub
