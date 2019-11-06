@@ -61,7 +61,7 @@ const submitTransaction = async (request, response) => {
   }
 
   return response.status(responseCode).json(responseData);
-}
+};
 
 const resetTransactionsPerUser = async (request, response) => {
   if (!baseController.isTokenInHeader(request)) {
@@ -88,7 +88,7 @@ const resetTransactionsPerUser = async (request, response) => {
   }
 
   return response.status(responseCode).json(responseData);
-}
+};
 
 module.exports = {
   submitTransaction,

@@ -101,7 +101,7 @@ module.exports = function setupEventsService(dbInstance) {
           event.eventType = recrutingEventType;
         }
       }
-    } catch (e) {
+    } catch (err) {
       console.error('Error getting event information: ', err);
       event = {};
     }

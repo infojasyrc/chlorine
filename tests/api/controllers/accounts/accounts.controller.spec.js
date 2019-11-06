@@ -112,4 +112,4 @@ test.serial('Get all accounts', async t => {
   t.true(res.status.called, 'Expected response status was executed');
   t.true(res.status.calledWith(200), 'Expected response status with success response');
   t.true(res.json.called, 'Expected response json was executed');
-})
+});

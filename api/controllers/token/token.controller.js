@@ -16,7 +16,7 @@ const handleAuthorizationCodeGrantType = async (request) => {
 
 const handleRefreshTokenGrantType = async (request) => {
   if (!request.body.refresh_token) {
-    return {responseCode: 404, data: {}};;
+    return {responseCode: 404, data: {}};
   }
   return await dbService.getAccessTokenByRefreshToken(request.body.refresh_token);
 };

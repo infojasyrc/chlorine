@@ -36,7 +36,7 @@ function getSetupDBService(userService) {
     storage: () => {
       return {
         bucket: () => {}
-      }
+      };
     }
   };
 
@@ -139,7 +139,7 @@ test.serial('Create user: validate params', async t => {
   let userService = {};
   const setupDBService = getSetupDBService(userService);
 
-  userController = getController(setupDBService)
+  userController = getController(setupDBService);
 
   await userController.post(req, res);
 

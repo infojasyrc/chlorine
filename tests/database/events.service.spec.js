@@ -201,4 +201,4 @@ test.serial('Delete event', async t => {
   const deleteAttendeeResponse = await eventsService.remove(eventId);
   t.is(deleteAttendeeResponse.hasOwnProperty('message'), true, 'Expected message key');
   t.is(deleteAttendeeResponse.hasOwnProperty('data'), true, 'Expected data key');
-})
+});

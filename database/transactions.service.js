@@ -88,7 +88,7 @@ module.exports = function setupTransactionsService (dbInstance) {
         serviceType: data.serviceType,
         transactionType: data.transactionType,
         amount: data.amount
-      }
+      };
     }
 
     return {
@@ -140,4 +140,4 @@ module.exports = function setupTransactionsService (dbInstance) {
     isTransfer,
     validateDataByTransactionType
   };
-}
+};

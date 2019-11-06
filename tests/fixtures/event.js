@@ -33,7 +33,7 @@ class MockEvent {
   generateList(eventsData) {
     const events = [];
     for (let i = 0; i < eventsData.length; i++) {
-      events.push(generateEvent(eventsData[i]));
+      events.push(this.generate(eventsData[i]));
     }
     return events;
   }

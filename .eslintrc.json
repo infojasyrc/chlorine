@@ -8,22 +8,22 @@
   },
   "extends": "eslint:recommended",
   "parserOptions": {
-    "ecmaVersion": 8,
-    "ecmaFeatures": {
-      "experimentalObjectRestSpread": true
-    },
+    "ecmaVersion": 2018,
     "sourceType": "module"
   },
   "rules": {
-    "quotes": [
-      "error",
-      "single"
-    ],
-    "semi": [
-      "error",
-      "always"
-    ],
+    "quotes": ["error", "single"],
+    "semi": ["error", "always"],
+    "eqeqeq": "warn",
     "no-console": 0,
     "no-unused-vars": 0
-  }
+  },
+  "overrides": [
+    {
+      "files": ["api/*/*.js", "database/*.js"],
+      "rules": {
+        "quotes": ["error", "single"]
+      }
+    }
+  ]
 }

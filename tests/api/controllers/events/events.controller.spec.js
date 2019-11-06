@@ -37,7 +37,7 @@ function getSetupDBService(eventsService) {
     storage: () => {
       return {
         bucket: () => {}
-      }
+      };
     }
   };
 

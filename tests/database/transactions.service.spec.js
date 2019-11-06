@@ -26,7 +26,7 @@ const setupTransactionsService = proxyquire('./../../database/transactions.servi
           message: ''
         });
       }
-    }
+    };
   }
 });
 
@@ -46,7 +46,7 @@ test.beforeEach(() => {
       add: (transactionData) => {
         return Promise.resolve({
           id: 'newTransactionDocumentId'
-        })
+        });
       }
     });
 

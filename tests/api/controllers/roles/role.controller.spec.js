@@ -31,7 +31,7 @@ function getSetupDBService(roleService) {
     storage: () => {
       return {
         bucket: () => {}
-      }
+      };
     }
   };
 

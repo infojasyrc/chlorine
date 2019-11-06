@@ -36,7 +36,7 @@ test.serial('Do list all roles', async t => {
             message: 'Getting data successfully'
           });
         }
-      }
+      };
     }
   });
 

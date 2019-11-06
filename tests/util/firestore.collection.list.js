@@ -6,7 +6,7 @@ const MockFirestoreCollectionListElement = require('./firestore.collection.list.
 const FixtureService = require('./../fixtures/fixtures.service');
 
 class MockFirestoreCollectionList {
-  constructor() {}
+  constructor() {}
 
   static get(mockFixtureData, numberOfElements) {
     const fixtureData = FixtureService.getFixture(mockFixtureData);

@@ -24,10 +24,10 @@ test.beforeEach(() => {
         return {
           get: () => {
             return Promise.resolve({
-              docs: [{id: 'thisIsAuthCodeDocId', data: () => {return {uid: 'thisIsAUserId'}}}]
+              docs: [{id: 'thisIsAuthCodeDocId', data: () => {return {uid: 'thisIsAUserId'};}}]
             });
           }
-        }
+        };
       },
       doc: () => {
         return {
@@ -35,7 +35,7 @@ test.beforeEach(() => {
           set: () => {
             return Promise.resolve({});
           }
-        }
+        };
       }
     });
 

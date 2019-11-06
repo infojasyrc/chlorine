@@ -10,7 +10,7 @@ module.exports = function setupFirebaseApplication() {
     app = admin.initializeApp({
       credential: admin.credential.cert(serviceAccount),
       databaseURL: 'https://spidernode-app.firebaseio.com',
-      storageBucket: "spider-node-app.appspot.com",
+      storageBucket: 'spider-node-app.appspot.com',
     });
   }
 

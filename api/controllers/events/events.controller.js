@@ -23,10 +23,10 @@ const get = async (request, response) => {
   eventParameters.headquarterId = request.query.headquarterId;
 
   eventParameters.showAll = !request.query.showAll ?
-    false: request.query.showAll === "true";
+    false: request.query.showAll === 'true';
 
   eventParameters.withAttendees = !request.query.withAttendees ?
-    false: request.query.withAttendees === "true";
+    false: request.query.withAttendees === 'true';
 
   try {
     const events = await dbService.eventsService.doList(eventParameters);

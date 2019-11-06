@@ -1,6 +1,6 @@
 'use strict';
 
-const EventFixture = require('./event')
+const EventFixture = require('./event');
 
 class FixtureService {
   constructor() {}

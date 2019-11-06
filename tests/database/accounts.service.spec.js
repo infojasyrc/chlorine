@@ -64,9 +64,9 @@ test.beforeEach(() => {
                   }]
                 );
               }
-            }
+            };
           }
-        }
+        };
       },
       doc: () => {
         return {
@@ -86,7 +86,7 @@ test.beforeEach(() => {
           update: () => {
             return Promise.resolve({});
           }
-        }
+        };
       }
     });
 

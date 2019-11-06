@@ -9,7 +9,7 @@
     "start": "npm run generate:keys:dev && node index.js",
     "test": "npm run generate:keys:test && nyc --reporter=lcov ava",
     "watch:test": "ava --watch",
-    "lint": "npx eslint .eslintrc.json"
+    "lint": "npx eslint . .eslintrc.json --fix"
   },
   "repository": {
     "type": "git",
@@ -22,6 +22,7 @@
   "devDependencies": {
     "ava": "^1.4.1",
     "eslint": "^5.16.0",
+    "eslint-plugin-promise": "^4.2.1",
     "mock-req-res": "^1.1.0",
     "nodemon": "^1.19.1",
     "nyc": "^14.1.1",

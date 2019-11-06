@@ -195,7 +195,7 @@ const deleteImage = async (request, response) => {
   return response
     .status(responseCode)
     .json(responseData);
-}
+};
 
 const open = async (request, response) => {
   if (!request.params.id) {
@@ -223,7 +223,7 @@ const open = async (request, response) => {
   return response
     .status(responseCode)
     .json(responseData);
-}
+};
 
 const pause = async (request, response) => {
   if (!request.params.id) {
@@ -250,7 +250,7 @@ const pause = async (request, response) => {
   return response
     .status(responseCode)
     .json(responseData);
-}
+};
 
 const close = async (request, response) => {
   if (!request.params.id) {
@@ -279,7 +279,7 @@ const close = async (request, response) => {
   return response
     .status(responseCode)
     .json(responseData);
-}
+};
 
 const addAttendees = async (request, response) => {
   if (!request.params.id || !request.body.attendees) {
@@ -312,7 +312,7 @@ const addAttendees = async (request, response) => {
   return response
     .status(responseCode)
     .json(responseData);
-}
+};
 
 const remove = async (request, response) => {
   if (!request.params.id) {
@@ -338,7 +338,7 @@ const remove = async (request, response) => {
     responseData = baseController.getSuccessResponse(eventResponse.data, eventResponse.message);
   } catch (err) {
     const errorMessage = `Error while removing event with id: ${id}`;
-    console.error(errorMessage, err)
+    console.error(errorMessage, err);
     responseCode = 500;
     responseData = baseController.getErrorResponse('Error while removing event');
   }
@@ -346,7 +346,7 @@ const remove = async (request, response) => {
   return response
     .status(responseCode)
     .json(responseData);
-}
+};
 
 module.exports = {
   get,

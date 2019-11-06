@@ -31,7 +31,7 @@ function getSetupDBService(headquarterService) {
     storage: () => {
       return {
         bucket: () => {}
-      }
+      };
     }
   };
 

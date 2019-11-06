@@ -24,7 +24,7 @@ test.beforeEach(() => {
     storage: () => {
       return {
         bucket: () => {}
-      }
+      };
     }
   };
 

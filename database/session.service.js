@@ -26,6 +26,6 @@ module.exports = function setupSessionService (adminAuthInstance) {
 
   return {
     getUserSession
-  }
+  };
 
-}
+};

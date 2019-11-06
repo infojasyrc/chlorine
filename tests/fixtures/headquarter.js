@@ -9,12 +9,12 @@ class MockHeadquarter {
     return {
       id: 'SXd0Jb0kzzxERzI2S4hc',
       name: 'Buenos Aires'
-    }
+    };
   }
 
   static getAll() {
     return [
-      getBuenosAires()
+      this.getBuenosAires()
     ];
   }
 }

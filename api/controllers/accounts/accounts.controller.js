@@ -38,7 +38,7 @@ const checkBalance = async (request, response) => {
   }
 
   return response.status(responseCode).json(responseData);
-}
+};
 
 const getAll = async (request, response) => {
   if (!baseController.isTokenInHeader(request)) {
@@ -69,7 +69,7 @@ const getAll = async (request, response) => {
   }
 
   return response.status(responseCode).json(responseData);
-}
+};
 
 module.exports = {
   checkBalance,

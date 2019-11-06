@@ -43,7 +43,7 @@ function getController() {
               return {
                 amount: data.amount,
                 transactionType: data.transactionType
-              }
+              };
             },
             makeTransaction: () => {
               return Promise.resolve({
