@@ -16,7 +16,7 @@ module.exports = function setupAuthCodesService(adminInstance, dbInstance) {
 
   function getUserId(authCodeRef) {
     const authCodeData = authCodeRef.docs[0];
-    return authCodeData.data().uid;
+    return authCodeData.data().userId;
   }
 
   async function createCustomToken(userId) {
