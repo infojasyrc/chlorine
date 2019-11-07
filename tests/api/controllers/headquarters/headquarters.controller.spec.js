@@ -35,7 +35,7 @@ function getSetupDBService(headquarterService) {
     }
   };
 
-  return proxyquire('./../../../../database', {
+  return proxyquire('./../../../../services', {
     './firebase.application': () => firebaseApplication,
     './firebase-admin.application': () => firebaseAdminApplication,
     './auth.codes.service': () => {},
@@ -53,7 +53,7 @@ function getSetupDBService(headquarterService) {
 
 function getController(allServices) {
   return proxyquire('./../../../../api/controllers/headquarters/headquarters.controller', {
-    './../../../database': allServices
+    './../../../services': allServices
   });
 }
 

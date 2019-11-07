@@ -48,7 +48,7 @@ test.afterEach(() => {
 function getSetupDBService(eventsService, storageService) {
   const mockStorageService = storageService ? storageService : {};
 
-  return proxyquire('./../../../../database', {
+  return proxyquire('./../../../../services', {
     './firebase.application': () => firebaseApplication,
     './firebase-admin.application': () => firebaseAdminApplication,
     './auth.codes.service': () => {},
@@ -66,7 +66,7 @@ function getSetupDBService(eventsService, storageService) {
 
 function getController(allServices) {
   return proxyquire('./../../../../api/controllers/events/event.controller', {
-    './../../../database': allServices
+    './../../../services': allServices
   });
 }
 

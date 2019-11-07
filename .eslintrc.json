@@ -20,7 +20,7 @@
   },
   "overrides": [
     {
-      "files": ["api/*/*.js", "database/*.js"],
+      "files": ["api/*/*.js", "services/*.js"],
       "rules": {
         "quotes": ["error", "single"]
       }

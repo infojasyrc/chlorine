@@ -19,7 +19,7 @@ test.afterEach(() => {
 
 function getController() {
   return proxyquire('./../../../../api/controllers/authentication/authentication.controller', {
-    './../../../database/service.container': (service) => {
+    './../../../services/service.container': (service) => {
       switch(service) {
         case 'authentication':
           return {

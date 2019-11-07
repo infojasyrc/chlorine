@@ -1,6 +1,6 @@
 'use strict';
 
-const serviceContainer = require('./../../../database/service.container');
+const serviceContainer = require('./../../../services/service.container');
 
 const dbService = serviceContainer('authCode');
 

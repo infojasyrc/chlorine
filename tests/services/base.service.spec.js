@@ -2,7 +2,7 @@
 
 const test = require('ava');
 
-const setupBaseService = require('./../../database/base.service');
+const setupBaseService = require('./../../services/base.service');
 
 let baseService;
 

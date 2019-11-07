@@ -3,7 +3,7 @@
 const test = require('ava');
 const sinon = require('sinon');
 
-const setupAuthCodesService = require('./../../database/auth.codes.service');
+const setupAuthCodesService = require('./../../services/auth.codes.service');
 
 const collectionKey = 'auth_codes';
 const adminInstanceStub = {};

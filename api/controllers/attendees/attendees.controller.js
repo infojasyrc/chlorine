@@ -1,7 +1,7 @@
 'use strict';
 
 const {parse} = require('json2csv');
-const setupDBService = require('./../../../database');
+const setupDBService = require('./../../../services');
 const dbService = setupDBService();
 
 const get = async (request, response) => {

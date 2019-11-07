@@ -3,7 +3,7 @@
 const test = require('ava');
 const sinon = require('sinon');
 
-const setupAuthenticationService = require('./../../database/authentication.service');
+const setupAuthenticationService = require('../../services/authentication.service');
 
 let authenticationService;
 let clientInstanceStub;

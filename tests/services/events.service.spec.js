@@ -5,7 +5,7 @@ const sinon = require('sinon');
 
 const mockFirestoreCollectionList = require('./../util/firestore.collection.list');
 
-const setupEventsService = require('../../database/events.service');
+const setupEventsService = require('../../services/events.service');
 
 let collectionKey = 'events';
 let sandbox = null;

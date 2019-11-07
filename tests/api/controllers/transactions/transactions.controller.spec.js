@@ -25,7 +25,7 @@ test.afterEach(() => {
 
 function getController() {
   return proxyquire('./../../../../api/controllers/transactions/transactions.controller', {
-    './../../../database/service.container': (serviceName) => {
+    './../../../services/service.container': (serviceName) => {
       switch(serviceName) {
         case 'session':
           return {

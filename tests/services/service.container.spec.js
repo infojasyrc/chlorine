@@ -3,7 +3,7 @@
 const test = require('ava');
 const proxyquire = require('proxyquire');
 
-const serviceContainer = proxyquire('./../../database/service.container', {
+const serviceContainer = proxyquire('./../../services/service.container', {
   './': () => {
     return {
       eventsService: {

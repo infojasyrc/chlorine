@@ -1,7 +1,7 @@
 'use strict';
 
 const setupBaseController = require('./../base.controller');
-const serviceContainer = require('./../../../database/service.container');
+const serviceContainer = require('./../../../services/service.container');
 
 const baseController = new setupBaseController();
 const accountsService = serviceContainer('accounts');

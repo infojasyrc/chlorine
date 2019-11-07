@@ -22,7 +22,7 @@ test.afterEach(() => {
 
 function getController() {
   return proxyquire('./../../../../api/controllers/token/token.controller', {
-    './../../../database/service.container': () => {
+    './../../../services/service.container': () => {
       return {
         getAccessTokenByAuthCode: () => {
           return Promise.resolve({

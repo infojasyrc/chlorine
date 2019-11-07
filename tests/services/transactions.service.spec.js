@@ -4,7 +4,7 @@ const test = require('ava');
 const sinon = require('sinon');
 const proxyquire = require('proxyquire');
 
-const setupTransactionsService = proxyquire('./../../database/transactions.service', {
+const setupTransactionsService = proxyquire('./../../services/transactions.service', {
   './accounts.service': () => {
     return {
       getDefaultAccount: () => {

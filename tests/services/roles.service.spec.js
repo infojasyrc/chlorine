@@ -3,7 +3,7 @@
 const test = require('ava');
 const sinon = require('sinon');
 
-const setupRolesService = require('../../database/roles.service');
+const setupRolesService = require('../../services/roles.service');
 
 const collectionKey = 'roles';
 let rolesService;

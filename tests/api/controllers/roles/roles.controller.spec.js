@@ -27,7 +27,7 @@ test.serial('Do list all roles', async t => {
   const res = mockResponse();
 
   rolesController = proxyquire('./../../../../api/controllers/roles/roles.controller', {
-    './../../../database/service.container': () => {
+    './../../../services/service.container': () => {
       return {
         doList: () => {
           return Promise.resolve({

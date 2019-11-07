@@ -4,7 +4,7 @@ const test = require('ava');
 const sinon = require('sinon');
 
 const firebaseAdminMock = require('./../fixtures/admin.firebase.mock');
-const setupUserService = require('../../database/user.service');
+const setupUserService = require('../../services/user.service');
 
 let sandbox = null;
 let userService;

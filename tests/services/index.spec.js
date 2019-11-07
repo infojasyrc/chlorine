@@ -28,7 +28,7 @@ test.beforeEach(() => {
     }
   };
 
-  const setupDatabase = proxyquire('./../../database', {
+  const setupDatabase = proxyquire('./../../services', {
     './firebase.application': () => firebaseApplication,
     './firebase-admin.application': () => firebaseAdminApplication,
     './auth.codes.service': () => {},

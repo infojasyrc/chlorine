@@ -3,7 +3,7 @@
 const test = require('ava');
 const sinon = require('sinon');
 
-const setupHeadquartersService = require('../../database/headquarters.service');
+const setupHeadquartersService = require('../../services/headquarters.service');
 
 const collectionKey = 'headquarters';
 let sandbox = null;

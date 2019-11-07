@@ -1,7 +1,7 @@
 'use strict';
 
 const setupBaseController = require('./../base.controller');
-const serviceContainer = require('./../../../database/service.container');
+const serviceContainer = require('./../../../services/service.container');
 
 let baseController = new setupBaseController();
 const authenticationService = serviceContainer('authentication');
