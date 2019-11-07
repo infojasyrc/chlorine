@@ -12,6 +12,6 @@ router.post('/', userController.post);
 router.put('/:id', userController.update);
 router.delete('/:id', userController.remove);
 router.post('/:id/change-password', userController.changePassword);
-router.post('/users/by-uid', userController.getByUid);
+router.post('/by-uid/:id', userController.getByUid);
 
 module.exports = router;

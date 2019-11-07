@@ -27,6 +27,7 @@ module.exports = function setupAuthenticationService(clientAdminInstance, adminI
     return message;
   }
 
+  // @todo: this function should be deprecated to use client authentication
   async function login(data) {
     let response = {};
     let loginData = {
@@ -116,7 +117,7 @@ module.exports = function setupAuthenticationService(clientAdminInstance, adminI
   async function resetPassword(email) {
     try {
       await clientAuth.sendPasswordResetEmail(email, {
-        url: 'https://belatrix-meetapp.firebaseapp.com'
+        url: 'https://spider-node-app.firebaseapp.com'
       });
       baseService.returnData.message = 'An email was sent for resetting the password';
     } catch (err) {

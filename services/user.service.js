@@ -110,14 +110,15 @@ module.exports = function setupUserService(adminInstance, dbInstance) {
         user.id = userRefSnapshot.docs[0].id;
       }
 
+      baseService.returnData.responseCode = 200;
       baseService.returnData.message = 'Getting user information successfully';
     } catch (err) {
       console.error('Error getting user information', err);
       baseService.returnData.responseCode = 500;
       baseService.returnData.message = 'Error getting user information';
-    } finally {
-      baseService.returnData.data = user;
     }
+
+    baseService.returnData.data = user;
 
     return baseService.returnData;
   }

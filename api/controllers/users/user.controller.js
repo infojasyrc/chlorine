@@ -38,8 +38,7 @@ const get = async (request, response) => {
 
 const getByUid = async (request, response) => {
   if (!request.body.uid) {
-    return response
-      .status(200)
+    return response.status(400)
       .json({
         status: 'OK',
         data: {},
@@ -47,17 +46,14 @@ const getByUid = async (request, response) => {
       });
   }
 
-  let userData = await dbService
-    .userService
-    .findByUserId(request.body.uid);
+  const userData = await dbService.userService.findByUserId(request.body.uid);
+  const responseData = {
+    status: 'OK',
+    data: userData.data,
+    message: userData.message
+  };
 
-  return response
-    .status(200)
-    .json({
-      status: 'OK',
-      data: userData.data,
-      message: userData.message
-    });
+  return response.status(userData.responseCode).json(responseData);
 };
 
 const post = async (request, response) => {
