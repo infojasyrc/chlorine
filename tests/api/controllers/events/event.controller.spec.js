@@ -13,28 +13,11 @@ const setupBaseController = require('../../../../api/controllers/base.controller
 let sandbox = null;
 
 let eventController;
-let firebaseAdminApplication = null;
-let firebaseApplication = null;
 let eventsService = null;
 let baseController;
 
 test.beforeEach(() => {
   sandbox = sinon.createSandbox();
-
-  firebaseApplication = {
-    auth: sinon.stub(),
-    storage: sinon.stub()
-  };
-
-  firebaseAdminApplication = {
-    auth: sinon.stub(),
-    firestore: sinon.stub(),
-    storage: () => {
-      return {
-        bucket: () => {}
-      };
-    }
-  };
 
   eventsService = {};
 
@@ -46,11 +29,23 @@ test.afterEach(() => {
 });
 
 function getSetupDBService(eventsService, storageService) {
+  const getMockProviders = () => {
+    return {
+      clientAuth: sinon.stub(),
+      adminAuth: sinon.stub(),
+      dbInstance: sinon.stub(),
+      storage: () => {
+        return {
+          bucket: sinon.stub()
+        };
+      }
+    };
+  };
+
   const mockStorageService = storageService ? storageService : {};
 
   return proxyquire('./../../../../services', {
-    './firebase.application': () => firebaseApplication,
-    './firebase-admin.application': () => firebaseAdminApplication,
+    './../providers': getMockProviders,
     './auth.codes.service': () => {},
     './user.service': () => {},
     './attendees.service': () => {},

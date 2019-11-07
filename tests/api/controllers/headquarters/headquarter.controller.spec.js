@@ -21,24 +21,21 @@ test.afterEach(() => {
 });
 
 function getSetupDBService(headquarterService) {
-
-  const firebaseApplication = {
-    auth: sinon.stub()
-  };
-
-  const firebaseAdminApplication = {
-    auth: sinon.stub(),
-    firestore: sinon.stub(),
-    storage: () => {
-      return {
-        bucket: () => {}
-      };
-    }
+  const getMockProviders = () => {
+    return {
+      clientAuth: sinon.stub(),
+      adminAuth: sinon.stub(),
+      dbInstance: sinon.stub(),
+      storage: () => {
+        return {
+          bucket: sinon.stub()
+        };
+      }
+    };
   };
 
   return proxyquire('./../../../../services', {
-    './firebase.application': () => firebaseApplication,
-    './firebase-admin.application': () => firebaseAdminApplication,
+    './../providers': getMockProviders,
     './auth.codes.service': () => {},
     './user.service': () => {},
     './attendees.service': () => {},

@@ -1,7 +1,6 @@
 'use strict';
 
-const setupFirebaseApplication = require('./firebase.application');
-const setupFirebaseAdminApplication = require('./firebase-admin.application');
+const setupServiceProviders = require('./../providers');
 
 const setupUserService = require('./user.service');
 const setupAttendeesService = require('./attendees.service');
@@ -16,21 +15,19 @@ const setupTransactionsService = require('./transactions.service');
 const setupAuthCodeService = require('./auth.codes.service');
 
 module.exports = function () {
-
-  const firebase = setupFirebaseApplication();
-  const adminApp = setupFirebaseAdminApplication();
-
-  const authenticationService = setupAuthenticationService(firebase.auth(), adminApp.auth());
-  const userService = setupUserService(adminApp.auth(), adminApp.firestore());
-  const attendeesService = setupAttendeesService(adminApp.firestore());
-  const eventsService = setupEventsService(adminApp.firestore());
-  const rolesService = setupRolesService(adminApp.firestore());
-  const headquartersService = setupHeadquartersService(adminApp.firestore());
-  const storageService = setupStorageService(adminApp.storage().bucket());
-  const accountsService = setupAccountsService(adminApp.firestore());
-  const sessionService = setupSessionService(adminApp.auth());
-  const transactionsService = setupTransactionsService(adminApp.firestore());
-  const authCodesService = setupAuthCodeService(adminApp.auth(), adminApp.firestore());
+  const serviceProviders = setupServiceProviders();
+  
+  const authenticationService = setupAuthenticationService(serviceProviders.clientAuth, serviceProviders.adminAuth);
+  const userService = setupUserService(serviceProviders.adminAuth, serviceProviders.dbInstance);
+  const attendeesService = setupAttendeesService(serviceProviders.dbInstance);
+  const eventsService = setupEventsService(serviceProviders.dbInstance);
+  const rolesService = setupRolesService(serviceProviders.dbInstance);
+  const headquartersService = setupHeadquartersService(serviceProviders.dbInstance);
+  const storageService = setupStorageService(serviceProviders.bucket);
+  const accountsService = setupAccountsService(serviceProviders.dbInstance);
+  const sessionService = setupSessionService(serviceProviders.adminAuth);
+  const transactionsService = setupTransactionsService(serviceProviders.dbInstance);
+  const authCodesService = setupAuthCodeService(serviceProviders.adminAuth, serviceProviders.dbInstance);
 
   return {
     authCodesService,

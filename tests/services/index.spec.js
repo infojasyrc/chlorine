@@ -5,32 +5,26 @@ const sinon = require('sinon');
 const proxyquire = require('proxyquire');
 
 let sandbox = null;
-
-let firebaseAdminApplication = null;
-let firebaseApplication = null;
 let database = null;
 
 test.beforeEach(() => {
   sandbox = sinon.createSandbox();
 
-  firebaseApplication = {
-    auth: sinon.stub(),
-    storage: sinon.stub()
-  };
-
-  firebaseAdminApplication = {
-    auth: sinon.stub(),
-    firestore: sinon.stub(),
-    storage: () => {
-      return {
-        bucket: () => {}
-      };
-    }
+  const getMockProviders = () => {
+    return {
+      clientAuth: sinon.stub(),
+      adminAuth: sinon.stub(),
+      dbInstance: sinon.stub(),
+      storage: () => {
+        return {
+          bucket: sinon.stub()
+        };
+      }
+    };
   };
 
   const setupDatabase = proxyquire('./../../services', {
-    './firebase.application': () => firebaseApplication,
-    './firebase-admin.application': () => firebaseAdminApplication,
+    './../providers': getMockProviders,
     './auth.codes.service': () => {},
     './user.service': () => {},
     './attendees.service': () => {},
