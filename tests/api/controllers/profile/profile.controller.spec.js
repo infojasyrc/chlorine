@@ -5,8 +5,14 @@ const sinon = require('sinon');
 const { mockRequest, mockResponse } = require('mock-req-res');
 const proxyquire = require('proxyquire');
 
-test.beforeEach(() => {});
-test.afterEach(() => {});
+let sandbox;
+
+test.beforeEach(() => {
+  sandbox = sinon.createSandbox();
+});
+test.afterEach(() => {
+  sandbox && sandbox.restore();
+});
 
 const getController = () => {
   return proxyquire('./../../../../api/controllers/profile/profile.controller', {
@@ -16,6 +22,7 @@ const getController = () => {
           return {
             getUserSession: () => {
               return Promise.resolve({
+                status: true,
                 responseCode: 200,
                 message: 'Success',
                 data: {}
@@ -23,7 +30,28 @@ const getController = () => {
             }
           };
         case 'users':
-          return {};
+          return {
+            findByUserId: () => {
+              return Promise.resolve({
+                status: true,
+                data: {
+                  id: '',
+                  userId: '',
+                  name: '',
+                  email: '',
+                  lastName: '',
+                  isSuperAdmin: false,
+                  role: {
+                    name: 'Supervisor',
+                    id: ''
+                  },
+                  isAdmin: false
+                },
+                message: 'Getting user information successfully',
+                responseCode: 200
+              });
+            }
+          };
       }
     }
   });

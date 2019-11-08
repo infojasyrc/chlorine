@@ -18,9 +18,16 @@ const get = async (request, response) => {
 
   try {
     const sessionInfo = await sessionService.getUserSession(request.headers.authorization);
-    console.log(sessionInfo);
-    responseCode = sessionInfo.responseCode;
-    responseData = baseController.getSuccessResponse(sessionInfo.data, sessionInfo.message);
+
+    if (!sessionInfo.status || sessionInfo.responseCode !== 200) {
+      return response.status(sessionInfo.responseCode)
+        .json(baseController.getErrorResponse(sessionInfo.message));
+    }
+
+    const userResponse = await userService.findByUserId(sessionInfo.data);
+
+    responseCode = userResponse.responseCode;
+    responseData = baseController.getSuccessResponse(userResponse.data, userResponse.message);
 
   } catch (err) {
     const errorMessage = 'Error getting user profile';

@@ -14,5 +14,6 @@ router.use('/image', require('./image'));
 router.use('/accounts', require('./accounts'));
 router.use('/transactions', require('./transactions'));
 router.use('/token', require('./token'));
+router.use('/profile', require('./profile'));
 
 module.exports = router;

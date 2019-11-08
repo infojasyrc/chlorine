@@ -110,6 +110,7 @@ module.exports = function setupUserService(adminInstance, dbInstance) {
         user.id = userRefSnapshot.docs[0].id;
       }
 
+      baseService.returnData.status = true;
       baseService.returnData.responseCode = 200;
       baseService.returnData.message = 'Getting user information successfully';
     } catch (err) {

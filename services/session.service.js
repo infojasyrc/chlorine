@@ -13,6 +13,7 @@ module.exports = function setupSessionService (adminAuthInstance) {
     try {
       const decodedToken = await adminAuth.verifyIdToken(idToken);
 
+      baseService.returnData.status = true;
       baseService.returnData.data = decodedToken.uid;
       baseService.returnData.message = 'Getting user session information successfully';
     } catch (err) {
