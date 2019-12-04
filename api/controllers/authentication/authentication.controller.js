@@ -12,8 +12,9 @@ let responseCode;
 let responseData;
 
 const login = async (request, response) => {
+
   if (!request.body.email || !request.body.password) {
-    return response.status(400).json(baseController.getErrorResponse('Paramaters are missing'));
+    return response.status(400).json(baseController.getErrorResponse('Paramaters are missing for email or password'));
   }
 
   try {
