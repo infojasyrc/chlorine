@@ -19,7 +19,7 @@ app.use(function (request, response, next) {
 function checkPublicUrls(request) {
   return request.path.includes('/api/authenticate') ||
     request.path.includes('/api/events') ||
-    request.path.includes('/api/token/access-token');
+    request.path.includes('/api/token');
 }
 
 app.use(async(request, response, next) => {
