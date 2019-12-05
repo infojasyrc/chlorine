@@ -6,5 +6,6 @@ const tokenController = require('./token.controller');
 const router = express.Router();
 
 router.get('/access-token', tokenController.accessToken);
+router.post('/access-token', tokenController.accessToken);
 
 module.exports = router;
