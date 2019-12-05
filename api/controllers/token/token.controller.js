@@ -7,28 +7,42 @@ const dbService = serviceContainer('authCode');
 const authorizationCodeGrantType = 'authorization_code';
 const refreshTokenGrantType = 'refresh_token';
 
-const handleAuthorizationCodeGrantType = async (request) => {
-  if (!request.body.code) {
+const handleAuthorizationCodeGrantType = async (code) => {
+  if (!code) {
     return {responseCode: 404, data: {}};
   }
-  return await dbService.getAccessTokenByAuthCode(request.body.code);
+  return await dbService.getAccessTokenByAuthCode(code);
 };
 
-const handleRefreshTokenGrantType = async (request) => {
-  if (!request.body.refresh_token) {
+const handleRefreshTokenGrantType = async (refreshToken) => {
+  if (!refreshToken) {
     return {responseCode: 404, data: {}};
   }
-  return await dbService.getAccessTokenByRefreshToken(request.body.refresh_token);
+  return await dbService.getAccessTokenByRefreshToken(refreshToken);
 };
 
-const accessToken = async (request, response) => {
+const get = async (request, response) => {
+  if (request.query.grant_type === authorizationCodeGrantType) {
+    const responseData = await handleAuthorizationCodeGrantType(request.query.code);
+    return response.status(responseData.responseCode).json(responseData.data);
+  }
+
+  if (request.query.grant_type === refreshTokenGrantType) {
+    const responseData = await handleRefreshTokenGrantType(request.query.refresh_token);
+    return response.status(responseData.responseCode).json(responseData.data);
+  }
+
+  return response.status(404).json({});
+};
+
+const post = async (request, response) => {
   if (request.body.grant_type === authorizationCodeGrantType) {
-    const responseData = await handleAuthorizationCodeGrantType(request);
+    const responseData = await handleAuthorizationCodeGrantType(request.body.code);
     return response.status(responseData.responseCode).json(responseData.data);
   }
 
   if (request.body.grant_type === refreshTokenGrantType) {
-    const responseData = await handleRefreshTokenGrantType(request);
+    const responseData = await handleRefreshTokenGrantType(request.body.refresh_token);
     return response.status(responseData.responseCode).json(responseData.data);
   }
 
@@ -36,5 +50,6 @@ const accessToken = async (request, response) => {
 };
 
 module.exports = {
-  accessToken
+  get,
+  post
 };

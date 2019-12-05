@@ -53,7 +53,7 @@ test.serial('Access token: get access token ', async t => {
 
   authenticationController = getController();
 
-  await authenticationController.accessToken(req, res);
+  await authenticationController.post(req, res);
 
   t.true(res.status.called, 'Expected response status was executed');
   t.true(res.status.calledWith(200), 'Expected response status with success response');
@@ -72,7 +72,7 @@ test.serial('Access token: get refresh token ', async t => {
 
   authenticationController = getController();
 
-  await authenticationController.accessToken(req, res);
+  await authenticationController.post(req, res);
 
   t.true(res.status.called, 'Expected response status was executed');
   t.true(res.status.calledWith(200), 'Expected response status with success response');
