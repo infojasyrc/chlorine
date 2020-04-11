@@ -38,7 +38,7 @@ test.serial('Check users service', t => {
 });
 
 test.serial('Not service found', t => {
-  const error = t.throws(() => { serviceContainer('event'); }, Error);
+  const error = t.throws(() => { serviceContainer('event'); }, null);
   t.is(error.message, 'Invalid Service');
 });
 

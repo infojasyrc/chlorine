@@ -1,6 +1,6 @@
 'use strict';
 
-const uuidGenerator = require('uuid/v4');
+const { v4: uuidGenerator } = require('uuid');
 const FieldValue = require('firebase-admin').firestore.FieldValue;
 
 const BaseService = require('./base.service');
