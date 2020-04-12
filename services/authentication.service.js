@@ -8,54 +8,6 @@ module.exports = function setupAuthenticationService(clientAdminInstance, adminI
   const adminAuth = adminInstance;
   const baseService = new setupBaseService();
 
-  function getSpecificErrorMessage(errorCode) {
-    let message = '';
-    switch (errorCode) {
-      case 'auth/wrong-password':
-        message += 'Incorrect password';
-        break;
-      case 'auth/invalid-email':
-        message += 'Invalid email';
-        break;
-      case 'auth/user-disabled':
-        message += 'User is disabled';
-        break;
-      default:
-        message += 'Unknown error';
-        break;
-    }
-    return message;
-  }
-
-  // @todo: this function should be deprecated to use client authentication
-  async function login(data) {
-    let response = {};
-    let loginData = {
-      uid: '',
-      token: ''
-    };
-
-    try {
-      await clientAuth.signInWithEmailAndPassword(data.email, data.password);
-
-      loginData.uid = clientAuth.currentUser.uid;
-      loginData.token = await clientAuth.currentUser.getIdToken(true);
-
-      response = baseService.getSuccessResponse(
-        loginData,
-        'Login successful'
-      );
-    } catch (err) {
-      const errorMessage = 'Error in login: ';
-      console.error(errorMessage, err);
-      response = baseService.getErrorResponse(
-        errorMessage + getSpecificErrorMessage(err.code)
-      );
-    }
-
-    return response;
-  }
-
   async function checkLogin(email, password) {
     let flagAuthentication = false;
 
@@ -72,25 +24,6 @@ module.exports = function setupAuthenticationService(clientAdminInstance, adminI
       baseService.returnData.responseCode = 500;
     } finally {
       baseService.returnData.data = flagAuthentication;
-    }
-
-    return baseService.returnData;
-  }
-
-  async function changePassword(password) {
-    let flagResult = false;
-    let user = clientAuth.currentUser;
-
-    try {
-      await user.updatePassword(password);
-      flagResult = true;
-      baseService.returnData.message = 'Change password successfully';
-    } catch (err) {
-      console.error('Error updating password: ', err);
-      baseService.returnData.message = 'Error updating password';
-      baseService.returnData.responseCode = 500;
-    } finally {
-      baseService.returnData.data = flagResult;
     }
 
     return baseService.returnData;
@@ -114,22 +47,7 @@ module.exports = function setupAuthenticationService(clientAdminInstance, adminI
     return baseService.returnData;
   }
 
-  async function resetPassword(email) {
-    try {
-      await clientAuth.sendPasswordResetEmail(email, {
-        url: 'https://spider-node-app.firebaseapp.com'
-      });
-      baseService.returnData.message = 'An email was sent for resetting the password';
-    } catch (err) {
-      console.error('Error sending email for resetting password: ', err);
-      baseService.returnData.message = 'Error sending email for resetting password';
-      baseService.returnData.responseCode = 500;
-    }
-
-    return baseService.returnData;
-  }
-
-  async function logout(userId) {
+  async function revokeToken(userId) {
     try {
       await adminInstance.revokeRefreshTokens(userId);
       const userRecord = await adminAuth.getUser(userId);
@@ -175,12 +93,9 @@ module.exports = function setupAuthenticationService(clientAdminInstance, adminI
   }
 
   return {
-    login,
     checkLogin,
-    changePassword,
     changePasswordUsingAdminSDK,
-    logout,
-    verifyToken,
-    resetPassword
+    revokeToken,
+    verifyToken
   };
 };

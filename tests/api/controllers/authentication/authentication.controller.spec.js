@@ -23,16 +23,7 @@ function getController() {
       switch(service) {
         case 'authentication':
           return {
-            login: () => {
-              return Promise.resolve({
-                responseCode: 200,
-                data: {
-                  uid: 'abcdefg'
-                },
-                message: ''
-              });
-            },
-            logout: () => {
+            revokeToken: () => {
               return Promise.resolve({
                 responseCode: 200,
                 data: {}
@@ -77,7 +68,7 @@ function getController() {
   });
 }
 
-test.serial('Login: validate parameters', async t => {
+test.serial('Revoke token: validate params', async t => {
   const req = mockRequest({
     params: {}
   });
@@ -85,49 +76,14 @@ test.serial('Login: validate parameters', async t => {
 
   authenticationController = getController();
 
-  await authenticationController.login(req, res);
+  await authenticationController.revokeToken(req, res);
 
   t.true(res.status.called, 'Expected response status was executed');
   t.true(res.status.calledWith(400), 'Expected response status with success response');
   t.true(res.json.called, 'Expected response json was executed');
 });
 
-test.serial('Login: Get user information', async t => {
-  const req = mockRequest({
-    params: {},
-    body: {
-      email: 'test@email.com',
-      password: 'ultrasecret'
-    }
-  });
-  const res = mockResponse();
-
-  authenticationController = getController();
-
-  await authenticationController.login(req, res);
-
-  t.true(res.status.called, 'Expected response status was executed');
-  t.true(res.status.calledWith(200), 'Expected response status with success response');
-  t.true(res.json.called, 'Expected response json was executed');
-  console.log(res.json.calledWith());
-});
-
-test.serial('Logout: validate token', async t => {
-  const req = mockRequest({
-    params: {}
-  });
-  const res = mockResponse();
-
-  authenticationController = getController();
-
-  await authenticationController.logout(req, res);
-
-  t.true(res.status.called, 'Expected response status was executed');
-  t.true(res.status.calledWith(400), 'Expected response status with success response');
-  t.true(res.json.called, 'Expected response json was executed');
-});
-
-test.serial('Logout: success response', async t => {
+test.serial('Revoke token: success response', async t => {
   const req = mockRequest({
     params: {},
     headers: {
@@ -138,7 +94,7 @@ test.serial('Logout: success response', async t => {
 
   authenticationController = getController();
 
-  await authenticationController.logout(req, res);
+  await authenticationController.revokeToken(req, res);
 
   t.true(res.status.called, 'Expected response status was executed');
   t.true(res.status.calledWith(200), 'Expected response status with success response');

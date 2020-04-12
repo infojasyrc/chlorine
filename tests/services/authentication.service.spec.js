@@ -75,62 +75,6 @@ test.afterEach(() => {
   sandbox && sandbox.restore();
 });
 
-test.serial('Login', async t => {
-  const data = {
-    email: 'test@gmail.com',
-    password: 'password'
-  };
-
-  authenticationService = setupAuthenticationService(
-    clientInstanceStub,
-    adminInstanceStub
-  );
-
-  let authenticationResponse = await authenticationService.login(data);
-
-  t.is(authenticationResponse.hasOwnProperty('message'), true, 'Expected message key');
-  t.is(authenticationResponse.hasOwnProperty('data'), true, 'Expected data key');
-});
-
-test.serial('Check credentials for login', async t => {
-  const password = 'aaaaaaa';
-
-  authenticationService = setupAuthenticationService(
-    clientInstanceStub,
-    adminInstanceStub
-  );
-
-  let loginResult = await authenticationService.checkLogin(password);
-
-  t.is(loginResult.data, true, 'Expected success result');
-});
-
-test.serial('Change login password', async t => {
-  const password = 'bbbbbbb';
-
-  authenticationService = setupAuthenticationService(
-    clientInstanceStub,
-    adminInstanceStub
-  );
-
-  let processData = await authenticationService.changePassword(password);
-  t.is(processData.data, true, 'Expected success result');
-});
-
-test.serial('Reset password', async t => {
-  const emailTest = 'user@example.com';
-
-  authenticationService = setupAuthenticationService(
-    clientInstanceStub,
-    adminInstanceStub
-  );
-
-  const result = await authenticationService.resetPassword(emailTest);
-
-  t.is(result.hasOwnProperty('message'), true, 'Expected message key');
-  t.is(result.hasOwnProperty('data'), true, 'Expected data key');
-});
-
 test.serial('Change password using admin sdk: success response', async t => {
   const userId = 'pmBhQP2XYWQsdPB5g45pasa4teasdaTwYzM3uH22';
   const newPassword = 'newPassword';
@@ -194,7 +138,7 @@ test.serial('Logout', async t => {
     adminInstanceStub
   );
 
-  const authenticationResponse = await authenticationService.logout(userId);
+  const authenticationResponse = await authenticationService.revokeToken(userId);
 
   t.is(authenticationResponse.hasOwnProperty('message'), true, 'Expected message key');
   t.is(authenticationResponse.hasOwnProperty('data'), true, 'Expected data key');
