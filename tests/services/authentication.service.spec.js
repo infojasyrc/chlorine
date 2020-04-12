@@ -6,14 +6,12 @@ const sinon = require('sinon');
 const setupAuthenticationService = require('../../services/authentication.service');
 
 let authenticationService;
-let clientInstanceStub;
 let adminInstanceStub;
 let sandbox = null;
 
 test.beforeEach(() => {
   sandbox = sinon.createSandbox();
 
-  clientInstanceStub = {};
   adminInstanceStub = {};
 
   adminInstanceStub.revokeRefreshTokens = sandbox.stub();
@@ -31,43 +29,6 @@ test.beforeEach(() => {
         return Promise.resolve({});
       }
     });
-
-  clientInstanceStub.signInWithEmailAndPassword = sandbox.stub();
-  clientInstanceStub
-    .signInWithEmailAndPassword
-    .returns(Promise.resolve({}));
-
-  clientInstanceStub.currentUser = {
-    email: 'email@test.com'
-  };
-  clientInstanceStub.currentUser.reauthenticateAndRetrieveDataWithCredential = sandbox.stub();
-  clientInstanceStub.currentUser
-    .reauthenticateAndRetrieveDataWithCredential
-    .returns(Promise.resolve({}));
-  clientInstanceStub.currentUser.getIdToken = sandbox.stub();
-  clientInstanceStub
-    .currentUser.getIdToken
-    .returns(Promise.resolve('this is an expected token'));
-  clientInstanceStub.currentUser.updatePassword = sandbox.stub();
-  clientInstanceStub
-    .currentUser.updatePassword
-    .returns(Promise.resolve({}));
-
-  clientInstanceStub.signOut = sandbox.stub();
-  clientInstanceStub
-    .signOut
-    .returns(Promise.resolve({}));
-
-  clientInstanceStub.EmailAuthProvider = {};
-  clientInstanceStub.EmailAuthProvider.credential = sandbox.stub();
-  clientInstanceStub
-    .EmailAuthProvider.credential
-    .returns({});
-
-  clientInstanceStub.sendPasswordResetEmail = sandbox.stub();
-  clientInstanceStub
-    .sendPasswordResetEmail
-    .returns(Promise.resolve({}));
 
 });
 
@@ -92,10 +53,7 @@ test.serial('Change password using admin sdk: success response', async t => {
       disabled: false
     }));
 
-  authenticationService = setupAuthenticationService(
-    clientInstanceStub,
-    adminInstanceStub
-  );
+  authenticationService = setupAuthenticationService(adminInstanceStub);
 
   const result = await authenticationService.changePasswordUsingAdminSDK(
     userId,
@@ -115,10 +73,7 @@ test.serial('Change password using admin sdk: error response', async t => {
   adminInstanceStub.updateUser = sandbox.stub();
   adminInstanceStub.updateUser.returns(Promise.reject({}));
 
-  authenticationService = setupAuthenticationService(
-    clientInstanceStub,
-    adminInstanceStub
-  );
+  authenticationService = setupAuthenticationService(adminInstanceStub);
 
   const result = await authenticationService.changePasswordUsingAdminSDK(
     userId,
@@ -131,12 +86,10 @@ test.serial('Change password using admin sdk: error response', async t => {
   t.is(result['responseCode'], 500, 'Expected 500 error response');
 });
 
-test.serial('Logout', async t => {
+test.serial('Revoke token', async t => {
   const userId = 'thisIsAUserId';
-  authenticationService = setupAuthenticationService(
-    clientInstanceStub,
-    adminInstanceStub
-  );
+  
+  authenticationService = setupAuthenticationService(adminInstanceStub);
 
   const authenticationResponse = await authenticationService.revokeToken(userId);
 

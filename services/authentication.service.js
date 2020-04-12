@@ -2,13 +2,12 @@
 
 const setupBaseService = require('./base.service');
 
-module.exports = function setupAuthenticationService(clientAdminInstance, adminInstance) {
+module.exports = function setupAuthenticationService(adminInstance) {
 
-  const clientAuth = clientAdminInstance;
   const adminAuth = adminInstance;
   const baseService = new setupBaseService();
 
-  async function checkLogin(email, password) {
+  const checkLogin = async (email, password) => {
     let flagAuthentication = false;
 
     try {
@@ -27,9 +26,9 @@ module.exports = function setupAuthenticationService(clientAdminInstance, adminI
     }
 
     return baseService.returnData;
-  }
+  };
 
-  async function changePasswordUsingAdminSDK(userId, newPassword) {
+  const changePasswordUsingAdminSDK = async (userId, newPassword) => {
     try {
       const response = await adminAuth.updateUser(userId, {
         password: newPassword
@@ -45,9 +44,9 @@ module.exports = function setupAuthenticationService(clientAdminInstance, adminI
     }
 
     return baseService.returnData;
-  }
+  };
 
-  async function revokeToken(userId) {
+  const revokeToken = async (userId) => {
     try {
       await adminInstance.revokeRefreshTokens(userId);
       const userRecord = await adminAuth.getUser(userId);
@@ -62,9 +61,9 @@ module.exports = function setupAuthenticationService(clientAdminInstance, adminI
     }
 
     return baseService.returnData;
-  }
+  };
 
-  async function verifyToken(token) {
+  const verifyToken = async (token) => {
     let responseData = {
       verified: false
     };
@@ -90,7 +89,7 @@ module.exports = function setupAuthenticationService(clientAdminInstance, adminI
     }
 
     return baseService.returnData;
-  }
+  };
 
   return {
     checkLogin,

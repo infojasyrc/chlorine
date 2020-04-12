@@ -17,7 +17,7 @@ const setupAuthCodeService = require('./auth.codes.service');
 module.exports = function () {
   const serviceProviders = setupServiceProviders();
   
-  const authenticationService = setupAuthenticationService(serviceProviders.clientAuth, serviceProviders.adminAuth);
+  const authenticationService = setupAuthenticationService(serviceProviders.adminAuth);
   const userService = setupUserService(serviceProviders.adminAuth, serviceProviders.dbInstance);
   const attendeesService = setupAttendeesService(serviceProviders.dbInstance);
   const eventsService = setupEventsService(serviceProviders.dbInstance);
