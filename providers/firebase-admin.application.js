@@ -5,7 +5,7 @@ const serviceAccount = require('./../services-config/app.json');
 
 let app = null;
 
-module.exports = function setupFirebaseApplication() {
+module.exports = () => {
   if (!app) {
     app = admin.initializeApp({
       credential: admin.credential.cert(serviceAccount),

@@ -2,7 +2,7 @@
 
 const setupBaseService = require('./base.service');
 
-module.exports = function setupUserService(adminInstance, dbInstance) {
+module.exports = (adminInstance, dbInstance) => {
 
   const adminAuth = adminInstance;
   const collection = dbInstance.collection('users');
@@ -162,13 +162,9 @@ module.exports = function setupUserService(adminInstance, dbInstance) {
     let userResponse = null;
 
     try {
-      await collection
-        .doc(userId)
-        .update(userData);
+      await collection.doc(userId).update(userData);
 
-      let userInfoRef = await collection
-        .doc(userId)
-        .get();
+      let userInfoRef = await collection.doc(userId).get();
       userResponse = {
         ...userInfoRef.data(),
         id: userId
@@ -179,9 +175,9 @@ module.exports = function setupUserService(adminInstance, dbInstance) {
       console.error('Error updating a user: ', err);
       baseService.returnData.responseCode = 500;
       baseService.returnData.message = 'Error updating a user';
-    } finally {
-      baseService.returnData.data = userResponse;
     }
+
+    baseService.returnData.data = userResponse;
 
     return baseService.returnData;
   }

@@ -2,31 +2,10 @@
 
 const setupBaseService = require('./base.service');
 
-module.exports = function setupAuthenticationService(adminInstance) {
+module.exports = (adminInstance) => {
 
   const adminAuth = adminInstance;
   const baseService = new setupBaseService();
-
-  const checkLogin = async (email, password) => {
-    let flagAuthentication = false;
-
-    try {
-      let loginInfo = await login({
-        email: email,
-        password: password
-      });
-      baseService.returnData.message = loginInfo.message;
-      flagAuthentication = loginInfo.data.uid !== '';
-    } catch (err) {
-      console.error('Error on reauthentication process: ', err);
-      baseService.returnData.message = 'Error on reauthentication process';
-      baseService.returnData.responseCode = 500;
-    } finally {
-      baseService.returnData.data = flagAuthentication;
-    }
-
-    return baseService.returnData;
-  };
 
   const changePasswordUsingAdminSDK = async (userId, newPassword) => {
     try {
@@ -92,7 +71,6 @@ module.exports = function setupAuthenticationService(adminInstance) {
   };
 
   return {
-    checkLogin,
     changePasswordUsingAdminSDK,
     revokeToken,
     verifyToken

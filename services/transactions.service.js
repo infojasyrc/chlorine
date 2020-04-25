@@ -5,7 +5,7 @@ const FieldValue = require('firebase-admin').firestore.FieldValue;
 const setupBaseService = require('./base.service');
 const setupAccountsService = require('./accounts.service');
 
-module.exports = function setupTransactionsService (dbInstance) {
+module.exports = (dbInstance) => {
 
   const accountsService = setupAccountsService(dbInstance);
   const collection = dbInstance.collection('transactions');
@@ -13,7 +13,7 @@ module.exports = function setupTransactionsService (dbInstance) {
   const paymentTransactionType = 'payment';
   const transferTransactionType = 'transfer';
 
-  async function makeTransaction (userId, transactionData) {
+  const makeTransaction = async (userId, transactionData) => {
     let transactionCreated = null;
 
     try {
@@ -59,9 +59,9 @@ module.exports = function setupTransactionsService (dbInstance) {
     }
 
     return baseService.returnData;
-  }
+  };
 
-  async function deleteTransactions(userId) {
+  const deleteTransactions = async (userId) => {
     try {
       const allTransactions = await collection.where('userId', '==', userId).get();
 
@@ -80,9 +80,9 @@ module.exports = function setupTransactionsService (dbInstance) {
     }
 
     return baseService.returnData;
-  }
+  };
 
-  function formatTransactionDataFromRequest(data) {
+  const formatTransactionDataFromRequest = (data) => {
     if (isPayment(data.transactionType)) {
       return {
         serviceType: data.serviceType,
@@ -96,20 +96,20 @@ module.exports = function setupTransactionsService (dbInstance) {
       transactionType: data.transactionType,
       amount: data.amount
     };
-  }
+  };
 
-  function isServiceTypeAvailable(transactionDataRequest) {
+  const isServiceTypeAvailable = (transactionDataRequest) => {
     return transactionDataRequest.serviceType &&
       transactionDataRequest.serviceType.length > 0;
-  }
+  };
 
-  function isTransfer(transactionType) {
+  const isTransfer = (transactionType) => {
     return transactionType === transferTransactionType;
-  }
+  };
 
-  function isPayment(transactionType) {
+  const isPayment = (transactionType) => {
     return transactionType === paymentTransactionType;
-  }
+  };
 
   function isAccountDataAvailable(transactionDataRequest) {
     return transactionDataRequest.account &&
@@ -121,7 +121,7 @@ module.exports = function setupTransactionsService (dbInstance) {
       transactionDataRequest.account.phoneNumber.length > 0;
   }
 
-  function validateDataByTransactionType(transactionDataRequest) {
+  const validateDataByTransactionType = (transactionDataRequest) => {
     switch(transactionDataRequest.transactionType) {
       case paymentTransactionType:
         return isServiceTypeAvailable(transactionDataRequest);
@@ -130,7 +130,7 @@ module.exports = function setupTransactionsService (dbInstance) {
       default:
         return false;
     }
-  }
+  };
 
   return {
     deleteTransactions,

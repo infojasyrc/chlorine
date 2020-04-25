@@ -14,7 +14,7 @@ const setupSessionService = require('./session.service');
 const setupTransactionsService = require('./transactions.service');
 const setupAuthCodeService = require('./auth.codes.service');
 
-module.exports = function () {
+module.exports = () => {
   const serviceProviders = setupServiceProviders();
   
   const authenticationService = setupAuthenticationService(serviceProviders.adminAuth);

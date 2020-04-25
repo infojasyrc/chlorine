@@ -92,9 +92,7 @@ const post = async (request, response) => {
     responseData = baseController.getErrorResponse('Error creating a new user');
   }
 
-  return response
-    .status(responseCode)
-    .json(responseData);
+  return response.status(responseCode).json(responseData);
 };
 
 const update = async (request, response) => {
@@ -139,9 +137,7 @@ const update = async (request, response) => {
   let responseData;
 
   try {
-    const updatedData = await dbService
-      .userService
-      .update(userId, userData);
+    const updatedData = await dbService.userService.update(userId, userData);
 
     responseCode = updatedData.responseCode;
     responseData = baseController.getSuccessResponse(
@@ -154,9 +150,7 @@ const update = async (request, response) => {
     responseData = baseController.getErrorResponse('Error updating user information');
   }
 
-  return response
-    .status(responseCode)
-    .json(responseData);
+  return response.status(responseCode).json(responseData);
 };
 
 const remove = async (request, response) => {
@@ -185,9 +179,7 @@ const remove = async (request, response) => {
     responseData = baseController.getErrorResponse('Error removing user');
   }
 
-  return response
-    .status(responseCode)
-    .json(responseData);
+  return response.status(responseCode).json(responseData);
 };
 
 const changePassword = async (request, response) => {
@@ -206,21 +198,6 @@ const changePassword = async (request, response) => {
   let responseData;
 
   try {
-    const userInfo = await dbService.userService.findById(request.body.id);
-
-    const checkAuthentication = await dbService.authenticationService.checkLogin(
-      userInfo.data.email,
-      request.body.oldPassword
-    );
-
-    if (!checkAuthentication.data) {
-      return response
-        .status(401)
-        .json({
-          status: 'Unauthorized',
-          message: checkAuthentication.message
-        });
-    }
 
     const updatedUserData = await dbService.authenticationService.changePasswordUsingAdminSDK(
       request.body.uid,
@@ -228,24 +205,17 @@ const changePassword = async (request, response) => {
     );
 
     if (!updatedUserData.data) {
-      return response
-        .status(401)
-        .json({
+      return response.status(401).json(
+        {
           status: 'Unauthorized',
           message: updatedUserData.message
-        });
+        }
+      );
     }
 
-    await dbService.authenticationService.logout();
-
-    const loginData = await dbService.authenticationService.login({
-      email: userInfo.data.email,
-      password: request.body.newPassword
-    });
-
-    responseCode = loginData.responseCode;
+    responseCode = updatedUserData.responseCode;
     responseData = baseController.getSuccessResponse(
-      loginData.data,
+      updatedUserData.data,
       updatedUserData.message
     );
   } catch (err) {
@@ -254,9 +224,7 @@ const changePassword = async (request, response) => {
     responseData = baseController.getErrorResponse('Error changing password');
   }
 
-  return response
-    .status(responseCode)
-    .json(responseData);
+  return response.status(responseCode).json(responseData);
 };
 
 module.exports = {
