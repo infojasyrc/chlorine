@@ -17,9 +17,9 @@ app.use(function (request, response, next) {
 });
 
 function checkPublicUrls(request) {
-  return request.path.includes('/api/authenticate') ||
-    request.path.includes('/api/events') ||
-    request.path.includes('/api/token');
+  return request.path.includes('/v1/authenticate') ||
+    request.path.includes('/v1/events') ||
+    request.path.includes('/v1/token');
 }
 
 app.use(async(request, response, next) => {
@@ -57,6 +57,6 @@ app.use(
 );
 
 app.use(fileParser);
-app.use('/api/', require('./api/controllers'));
+app.use('/v1/', require('./api/controllers/v1'));
 
 module.exports = app;
