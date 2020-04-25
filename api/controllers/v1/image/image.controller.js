@@ -8,15 +8,13 @@ const dbService = setupDBService();
 
 const post = async (request, response) => {
   if (!request.files || request.files.length === 0) {
-    return response
-      .status(400)
-      .json(baseController.getErrorResponse('No files were uploaded'));
+    return response.status(400).json(baseController.getErrorResponse('No files were uploaded'));
   }
 
   const urls = [];
 
   for (const key in request.files) {
-    if (!request.files.hasOwnProperty(key)) {
+    if (!Object.prototype.hasOwnProperty.call(request.files, key)) {
       continue;
     }
 

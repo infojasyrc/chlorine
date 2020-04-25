@@ -97,9 +97,7 @@ const post = async (request, response) => {
 
 const update = async (request, response) => {
   if (!request.params.id) {
-    return response
-      .status(400)
-      .json(baseController.getErrorResponse('Parameter is missing'));
+    return response.status(400).json(baseController.getErrorResponse('Parameter is missing'));
   }
 
   const userId = request.params.id;
@@ -121,11 +119,11 @@ const update = async (request, response) => {
     userData.role = request.body.role;
   }
 
-  if (request.body.hasOwnProperty('isAdmin')) {
+  if (Object.prototype.hasOwnProperty.call(request.body, 'isAdmin')) {
     userData.isAdmin = request.body.isAdmin;
   }
 
-  if (request.body.hasOwnProperty('disabled')) {
+  if (Object.prototype.hasOwnProperty.call(request.body, 'disabled')) {
     userData.isEnabled = request.body.disabled;
   }
 
