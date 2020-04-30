@@ -11,22 +11,17 @@ const get = async (request, response) => {
   let responseCode;
   let responseData;
 
-  if (!request.query.headquarterId) {
-    return response
-      .status(400)
-      .json(baseController.getErrorResponse('No Headquarter provided'));
-  }
-
   eventParameters.year = !request.query.year ?
     new Date().getFullYear(): request.query.year;
 
-  eventParameters.headquarterId = request.query.headquarterId;
+  eventParameters.headquarterId = !request.query.headquarterId ?
+    null : request.query.headquarterId;
 
   eventParameters.showAll = !request.query.showAll ?
-    false: request.query.showAll === 'true';
+    false : request.query.showAll === 'true';
 
   eventParameters.withAttendees = !request.query.withAttendees ?
-    false: request.query.withAttendees === 'true';
+    false : request.query.withAttendees === 'true';
 
   try {
     const events = await dbService.eventsService.doList(eventParameters);

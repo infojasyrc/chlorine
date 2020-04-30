@@ -60,7 +60,7 @@ function getController(allServices) {
   });
 }
 
-test.serial('Check get events: validate params', async t => {
+test.skip('Check get events: validate params', async t => {
   const req = mockRequest({
     params: {},
     query: {}
@@ -79,7 +79,50 @@ test.serial('Check get events: validate params', async t => {
   t.true(res.json.called, 'Expected response json was executed');
 });
 
-test.serial('Check get events: retrieve all', async t => {
+test.serial('Get all events', async t => {
+  const requestParameters = {
+    params: {},
+    query: {}
+  };
+  const req = mockRequest(requestParameters);
+  const res = mockResponse();
+  const eventServiceResponse = {
+    responseCode: 200,
+    data: [],
+    message: 'Getting events information successfully'
+  };
+
+  const eventsParameters = {
+    year: new Date().getFullYear(),
+    headquarterId: null,
+    showAll: false,
+    withAttendees: false
+  };
+
+  const eventsService = {};
+  eventsService.doList = sandbox.stub();
+  eventsService.doList
+    .withArgs(eventsParameters)
+    .returns(Promise.resolve(eventServiceResponse));
+
+  const setupDBService = getSetupDBService(eventsService);
+
+  eventsController = getController(setupDBService);
+
+  await eventsController.get(req, res);
+
+  t.true(res.status.called, 'Expected response status was executed');
+  t.true(res.status.calledWith(eventServiceResponse.responseCode), 'Expected response status with success response');
+  t.true(res.json.called, 'Expected response json was executed');
+  t.true(res.json
+    .calledWith({
+      status: baseController.successStatus,
+      data: eventServiceResponse.data,
+      message: eventServiceResponse.message
+    }), 'Expected response json was executed');
+});
+
+test.serial('Get all events with headquarter', async t => {
   const requestParameters = {
     params: {},
     query: {
