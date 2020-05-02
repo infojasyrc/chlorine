@@ -25,40 +25,15 @@ test.afterEach(() => {
   sandbox && sandbox.restore();
 });
 
-function getSetupDBService(eventsService) {
-  const getMockProviders = () => {
-    return {
-      clientAuth: sinon.stub(),
-      adminAuth: sinon.stub(),
-      dbInstance: sinon.stub(),
-      storage: () => {
-        return {
-          bucket: sinon.stub()
-        };
-      }
-    };
-  };
-
-  return proxyquire('./../../../../../services', {
-    './../providers': getMockProviders,
-    './auth.codes.service': () => {},
-    './user.service': () => {},
-    './attendees.service': () => {},
-    './events.service': () => eventsService,
-    './authentication.service': () => {},
-    './roles.service': () => {},
-    './headquarters.service': () => {},
-    './storage.service': () => {},
-    './accounts.service': () => {},
-    './transactions.service': () => {}
-  });
-}
-
-function getController(allServices) {
+const getController = (doListImplementation) => {
   return proxyquire('./../../../../../api/controllers/v1/events/events.controller', {
-    './../../../../services': allServices
+    './../../../../services/service.container': () => {
+      return {
+        doList: doListImplementation
+      };
+    }
   });
-}
+};
 
 test.skip('Check get events: validate params', async t => {
   const req = mockRequest({
@@ -99,15 +74,11 @@ test.serial('Get all events', async t => {
     withAttendees: false
   };
 
-  const eventsService = {};
-  eventsService.doList = sandbox.stub();
-  eventsService.doList
-    .withArgs(eventsParameters)
-    .returns(Promise.resolve(eventServiceResponse));
+  const doListFunctionResponse = () => {
+    return Promise.resolve(eventServiceResponse);
+  };
 
-  const setupDBService = getSetupDBService(eventsService);
-
-  eventsController = getController(setupDBService);
+  eventsController = getController(doListFunctionResponse);
 
   await eventsController.get(req, res);
 
@@ -144,16 +115,11 @@ test.serial('Get all events with headquarter', async t => {
     withAttendees: false
   };
 
-  const eventsService = {};
-  eventsService.doList = sandbox.stub();
-  eventsService
-    .doList
-    .withArgs(eventsParameters)
-    .returns(Promise.resolve(eventServiceResponse));
+  const doListFunctionResponse = () => {
+    return Promise.resolve(eventServiceResponse);
+  };
 
-  const setupDBService = getSetupDBService(eventsService);
-
-  eventsController = getController(setupDBService);
+  eventsController = getController(doListFunctionResponse);
 
   await eventsController.get(req, res);
 
@@ -185,16 +151,11 @@ test.serial('Check get events: catch error', async t => {
     withAttendees: false
   };
 
-  let eventsService = {};
-  eventsService.doList = sandbox.stub();
-  eventsService
-    .doList
-    .withArgs(eventsParameters)
-    .returns(Promise.reject());
+  const doListFunctionResponse = () => {
+    return Promise.reject({ message: 'Error getting all events'});
+  };
 
-  const setupDBService = getSetupDBService(eventsService);
-
-  eventsController = getController(setupDBService);
+  eventsController = getController(doListFunctionResponse);
 
   await eventsController.get(req, res);
 
@@ -203,7 +164,7 @@ test.serial('Check get events: catch error', async t => {
   t.true(res.json.called, 'Expected response json was executed');
 });
 
-test.serial('Check get events with attendees: retrieve all', async t => {
+test.serial('Get events with attendees: retrieve all', async t => {
   const requestParameters = {
     params: {},
     query: {
@@ -226,16 +187,11 @@ test.serial('Check get events with attendees: retrieve all', async t => {
     withAttendees: true
   };
 
-  const eventsService = {};
-  eventsService.doList = sandbox.stub();
-  eventsService
-    .doList
-    .withArgs(eventsParameters)
-    .returns(Promise.resolve(eventServiceResponse));
+  const doListFunctionResponse = () => {
+    return Promise.resolve(eventServiceResponse);
+  };
 
-  const setupDBService = getSetupDBService(eventsService);
-
-  eventsController = getController(setupDBService);
+  eventsController = getController(doListFunctionResponse);
 
   await eventsController.get(req, res);
 

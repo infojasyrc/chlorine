@@ -1,10 +1,10 @@
 'use strict';
 
 const setupBaseController = require('../base.controller');
-const setupDBService = require('../../../../services');
+const serviceContainer = require('../../../../services/service.container');
 
 let baseController = new setupBaseController();
-const dbService = setupDBService();
+const eventsService = serviceContainer('events');
 
 const get = async (request, response) => {
   const eventParameters = {};
@@ -24,7 +24,7 @@ const get = async (request, response) => {
     false : request.query.withAttendees === 'true';
 
   try {
-    const events = await dbService.eventsService.doList(eventParameters);
+    const events = await eventsService.doList(eventParameters);
 
     responseCode = events.responseCode;
     responseData = baseController.getSuccessResponse(events.data, events.message);
