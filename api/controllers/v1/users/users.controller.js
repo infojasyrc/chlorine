@@ -1,17 +1,17 @@
 'use strict';
 
 const setupBaseController = require('../base.controller');
-const setupDBService = require('../../../../services');
+const serviceContainer = require('../../../../services/service.container');
 
 let baseController = new setupBaseController();
-const dbService = setupDBService();
+const userService = serviceContainer('users');
 
 const get = async (request, response) => {
   let responseCode;
   let responseData;
 
   try {
-    let usersData = await dbService.userService.doList();
+    const usersData = await userService.doList();
 
     responseCode = usersData.responseCode;
     responseData = baseController.getSuccessResponse(
@@ -24,9 +24,7 @@ const get = async (request, response) => {
     responseData = baseController.getErrorResponse('Error getting all users.');
   }
 
-  return response
-    .status(responseCode)
-    .json(responseData);
+  return response.status(responseCode).json(responseData);
 };
 
 module.exports = {
