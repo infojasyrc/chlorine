@@ -43,7 +43,7 @@ test.afterEach(() => {
   sandbox && sandbox.restore();
 });
 
-test.serial('Change password using admin sdk: success response', async t => {
+test.serial('Update user: change Password | Success response', async t => {
   const userId = 'pmBhQP2XYWQsdPB5g45pasa4teasdaTwYzM3uH22';
   const newPassword = 'newPassword';
 
@@ -73,7 +73,7 @@ test.serial('Change password using admin sdk: success response', async t => {
   t.is(result['responseCode'], 200, 'Expected 500 error response');
 });
 
-test.serial('Change password using admin sdk: error response', async t => {
+test.serial('Update user: change Password | Error response', async t => {
   const userId = 'pmBhQP2XYWQsdPB5g45pasa4teasdaTwYzM3uH22';
   const newPassword = 'newPassword';
 
