@@ -37,6 +37,7 @@ module.exports = dbInstance => {
 
   const doList = async () => {
     let allUsers = [];
+    let response;
 
     try {
       let userRefSnapshot = await collection.get();
@@ -47,20 +48,20 @@ module.exports = dbInstance => {
         allUsers.push(userData);
       });
 
-      baseService.returnData.message = 'Getting all user list information successfully.';
+      const successMessage = 'Getting all user list information successfully.';
+      response = baseService.getSuccessResponse(allUsers, successMessage);
     } catch (err) {
-      console.error('Error getting documents', err);
-      baseService.returnData.responseCode = 500;
-      baseService.returnData.message = 'Error getting user list information';
-    } finally {
-      baseService.returnData.data = allUsers;
+      const errorMessage = 'Error getting user list information';
+      console.error(errorMessage, err);
+      response = baseService.getErrorResponse(errorMessage);
     }
 
-    return baseService.returnData;
+    return response;
   };
 
   const findById = async id => {
     let user = null;
+    let response;
 
     try {
       let userRefSnapshot = await collection.doc(id).get();
@@ -70,20 +71,20 @@ module.exports = dbInstance => {
       }
 
       user.id = id;
-      baseService.returnData.message = 'Getting user information successfully';
+      const successMessage = 'Getting user information successfully';
+      response = baseService.getSuccessResponse(user, successMessage);
     } catch (err) {
-      console.error('Error getting user information', err);
-      baseService.returnData.responseCode = 500;
-      baseService.returnData.message = 'Error getting user information';
-    } finally {
-      baseService.returnData.data = user;
+      const errorMessage = 'Error getting user information';
+      console.error(errorMessage, err);
+      response = baseService.getErrorResponse(errorMessage);
     }
 
-    return baseService.returnData;
+    return response;
   };
 
   const findByUserId = async userId => {
     let user = null;
+    let response;
 
     try {
       let userRefSnapshot = await collection
@@ -96,18 +97,15 @@ module.exports = dbInstance => {
         user.id = userRefSnapshot.docs[0].id;
       }
 
-      baseService.returnData.status = true;
-      baseService.returnData.responseCode = 200;
-      baseService.returnData.message = 'Getting user information successfully';
+      const successMessage = 'Getting user information successfully';
+      response = baseService.getSuccessResponse(user, successMessage);
     } catch (err) {
-      console.error('Error getting user information', err);
-      baseService.returnData.responseCode = 500;
-      baseService.returnData.message = 'Error getting user information';
+      const errorMessage = 'Error getting user information';
+      console.error(errorMessage, err);
+      response = baseService.getErrorResponse(errorMessage);
     }
 
-    baseService.returnData.data = user;
-
-    return baseService.returnData;
+    return response;
   };
 
   /**
@@ -140,6 +138,7 @@ module.exports = dbInstance => {
 
   const update = async (userId, userData) => {
     let userResponse = null;
+    let response;
 
     try {
       await collection.doc(userId).update(userData);
@@ -150,16 +149,15 @@ module.exports = dbInstance => {
         id: userId
       };
 
-      baseService.returnData.message = 'User was updated successfully';
+      const successMessage = 'User was updated successfully';
+      response = baseService.getSuccessResponse(userResponse, successMessage);
     } catch (err) {
+      const errorMessage = 'Error updating a user';
       console.error('Error updating a user: ', err);
-      baseService.returnData.responseCode = 500;
-      baseService.returnData.message = 'Error updating a user';
+      response = baseService.getErrorResponse(errorMessage);
     }
 
-    baseService.returnData.data = userResponse;
-
-    return baseService.returnData;
+    return response;
   };
 
   return {
