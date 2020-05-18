@@ -120,7 +120,7 @@ test.serial('Create authentication user: success response', async t => {
   authenticationService = setupAuthenticationService(adminInstanceStub);
 
   const newAuthUserResponse = await authenticationService.createUser(userData);
-  console.log(newAuthUserResponse);
+
   t.is(Object.prototype.hasOwnProperty.call(newAuthUserResponse, 'message'), true, 'Expected message key');
   t.is(Object.prototype.hasOwnProperty.call(newAuthUserResponse, 'data'), true, 'Expected data key');
   t.is(Object.prototype.hasOwnProperty.call(newAuthUserResponse['data'], 'uid'), true, 'Expected data key');
