@@ -25,6 +25,29 @@ module.exports = (adminInstance) => {
     return baseService.returnData;
   };
 
+
+  /**
+   * Create an authentication user
+   * @param {Object} userData 
+   * @returns {Object}
+   */
+  const createUser = async userData => {
+    let response;
+
+    try {
+      const authResponse = await adminAuth.createUser(userData);
+      const successMessage = 'Authentication created successfully';
+      response = baseService.getSuccessResponse({...authResponse}, successMessage);
+
+    } catch (error) {
+      const errorMessage = 'Error creating user auth';
+      console.error(errorMessage, error);
+      response = baseService.getErrorResponse(errorMessage);
+    }
+
+    return response;
+  };
+
   const revokeToken = async (userId) => {
     try {
       await adminInstance.revokeRefreshTokens(userId);
@@ -72,6 +95,7 @@ module.exports = (adminInstance) => {
 
   return {
     changePasswordUsingAdminSDK,
+    createUser,
     revokeToken,
     verifyToken
   };
