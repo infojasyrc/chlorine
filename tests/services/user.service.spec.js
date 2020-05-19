@@ -3,19 +3,15 @@
 const test = require('ava');
 const sinon = require('sinon');
 
-const firebaseAdminMock = require('./../fixtures/admin.firebase.mock');
 const setupUserService = require('../../services/user.service');
 
 let sandbox = null;
 let userService;
-let adminInstanceStub = null;
 let dbInstanceStub = null;
 let collectionKey = 'users';
 
 test.beforeEach(() => {
   sandbox = sinon.createSandbox();
-
-  adminInstanceStub = firebaseAdminMock;
 
   dbInstanceStub = {};
   dbInstanceStub.collection = sandbox.stub();
@@ -100,7 +96,7 @@ test.beforeEach(() => {
       }
     });
 
-  userService = setupUserService(adminInstanceStub, dbInstanceStub);
+  userService = setupUserService(dbInstanceStub);
 });
 
 test.afterEach(() => {
@@ -109,23 +105,24 @@ test.afterEach(() => {
   userService = null;
 });
 
-test.serial('Create user', async t => {
-  const data = {
-    email: 'test@test.com',
-    password: '',
+test.serial('Create user: success response', async t => {
+  const userData = {
     name: 'Juan',
     lastName: 'Perez',
+    email: 'test@email.com',
     isAdmin: true,
+    isEnabled: true,
     role: {
       id: '1',
       name: 'Marketing'
     }
   };
+  const userId = 'ThisIsAUserUID';
 
-  let newUser = await userService.create(data);
+  let newUser = await userService.create(userData, userId);
 
-  t.is(newUser.hasOwnProperty('message'), true, 'Expected message key');
-  t.is(newUser.hasOwnProperty('data'), true, 'Expected data key');
+  t.is(Object.prototype.hasOwnProperty.call(newUser, 'message'), true, 'Expected message key');
+  t.is(Object.prototype.hasOwnProperty.call(newUser, 'data'), true, 'Expected data key');
 
   t.is(newUser['data'].hasOwnProperty('userId'), true, 'Expected userId key');
   t.is(newUser['data'].hasOwnProperty('id'), true, 'Expected id key');
@@ -133,7 +130,6 @@ test.serial('Create user', async t => {
   t.is(newUser['data'].hasOwnProperty('name'), true, 'Expected name key');
   t.is(newUser['data'].hasOwnProperty('lastName'), true, 'Expected lastName key');
   t.is(newUser['data'].hasOwnProperty('isAdmin'), true, 'Expected isAdmin key');
-  t.is(newUser['data'].hasOwnProperty('avatarUrl'), true, 'Expected avatarUrl key');
   t.is(newUser['data'].hasOwnProperty('isEnabled'), true, 'Expected isEnabled key');
   t.is(newUser['data'].hasOwnProperty('role'), true, 'Expected role key');
 });

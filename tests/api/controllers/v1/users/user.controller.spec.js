@@ -14,9 +14,20 @@ let sandbox = null;
 
 let userController;
 let baseController;
+const userService = {};
+const authenticationService = {};
 
 test.beforeEach(() => {
   sandbox = sinon.createSandbox();
+
+  userService.findById = sandbox.stub();
+  userService.findByUserId = sandbox.stub();
+  userService.create = sandbox.stub();
+  userService.toggleEnable = sandbox.stub();
+  userService.update = sandbox.stub();
+
+  authenticationService.changePasswordUsingAdminSDK = sandbox.stub();
+  authenticationService.changeAvailability = sandbox.stub();
 
   baseController = new setupBaseController();
 });
@@ -25,40 +36,21 @@ test.afterEach(() => {
   sandbox && sandbox.restore();
 });
 
-function getSetupDBService(userService) {
-  const getMockProviders = () => {
-    return {
-      clientAuth: sinon.stub(),
-      adminAuth: sinon.stub(),
-      dbInstance: sinon.stub(),
-      storage: () => {
-        return {
-          bucket: sinon.stub()
-        };
-      }
-    };
-  };
-
-  return proxyquire('./../../../../../services', {
-    './../providers': getMockProviders,
-    './auth.codes.service': () => {},
-    './user.service': () => userService,
-    './attendees.service': () => {},
-    './events.service': () => {},
-    './authentication.service': () => {},
-    './roles.service': () => {},
-    './headquarters.service': () => {},
-    './storage.service': () => {},
-    './accounts.service': () => {},
-    './transactions.service': () => {}
-  });
-}
-
-function getController(allServices) {
+const getController = () => {
   return proxyquire('./../../../../../api/controllers/v1/users/user.controller', {
-    './../../../../services': allServices
+    './../../../../services/service.container': (service) => {
+      switch(service) {
+        case 'users':
+        default: {
+          return userService;
+        }
+        case 'authentication': {
+          return authenticationService;
+        }
+      }
+    }
   });
-}
+};
 
 test.serial('Get user: validate params', async t => {
   const req = mockRequest({
@@ -66,10 +58,7 @@ test.serial('Get user: validate params', async t => {
   });
   const res = mockResponse();
 
-  let userService = {};
-  const setupDBService = getSetupDBService(userService);
-
-  userController = getController(setupDBService);
+  userController = getController();
 
   await userController.get(req, res);
 
@@ -95,16 +84,11 @@ test.serial('Get user: retrieve data', async t => {
     message: 'Getting user information successfully'
   };
 
-  let userService = {};
-  userService.findById = sandbox.stub();
-  userService
-    .findById
-    .withArgs(userId)
-    .returns(Promise.resolve(userServiceResponse));
+  userService.findById.withArgs(userId).returns(
+    Promise.resolve(userServiceResponse)
+  );
 
-  const setupDBService = getSetupDBService(userService);
-
-  userController = getController(setupDBService);
+  userController = getController();
 
   await userController.get(req, res);
 
@@ -134,10 +118,7 @@ test.serial('Create user: validate params', async t => {
   });
   const res = mockResponse();
 
-  let userService = {};
-  const setupDBService = getSetupDBService(userService);
-
-  userController = getController(setupDBService);
+  userController = getController();
 
   await userController.post(req, res);
 
@@ -154,7 +135,8 @@ test.serial('Create user: success response', async t => {
     name: 'Juan',
     lastName: 'Perez',
     email: 'test@unittest.com',
-    role: {}
+    role: {},
+    uid: 'ThisIsAUserUId'
   };
 
   const req = mockRequest({
@@ -167,15 +149,11 @@ test.serial('Create user: success response', async t => {
     message: 'Adding user successfully'
   };
 
-  let userService = {};
-  userService.create = sandbox.stub();
-  userService
-    .create
-    .returns(Promise.resolve(userServiceResponse));
+  userService.create.returns(
+    Promise.resolve(userServiceResponse)
+  );
 
-  const setupDBService = getSetupDBService(userService);
-
-  userController = getController(setupDBService);
+  userController = getController();
 
   await userController.post(req, res);
 
@@ -201,10 +179,7 @@ test.serial('Update user: validate params', async t => {
   });
   const res = mockResponse();
 
-  let userService = {};
-  const setupDBService = getSetupDBService(userService);
-
-  userController = getController(setupDBService);
+  userController = getController();
 
   await userController.update(req, res);
 
@@ -239,16 +214,12 @@ test.serial('Update user: success response', async t => {
     data: {},
     message: 'Updating user successfully'
   };
+  
+  userService.update.returns(
+    Promise.resolve(userServiceResponse)
+  );
 
-  let userService = {};
-  userService.update = sandbox.stub();
-  userService
-    .update
-    .returns(Promise.resolve(userServiceResponse));
-
-  const setupDBService = getSetupDBService(userService);
-
-  userController = getController(setupDBService);
+  userController = getController();
 
   await userController.update(req, res);
 
@@ -274,10 +245,7 @@ test.serial('Remove user: validate params', async t => {
   });
   const res = mockResponse();
 
-  let userService = {};
-  const setupDBService = getSetupDBService(userService);
-
-  userController = getController(setupDBService);
+  userController = getController();
 
   await userController.remove(req, res);
 
@@ -298,21 +266,36 @@ test.serial('Remove user: success response', async t => {
     }
   });
   const res = mockResponse();
+
   const userServiceResponse = {
     responseCode: 200,
-    data: {},
-    message: 'Removing user successfully'
+    data: {
+      userId: 'ThisIsAUserId',
+      name: 'Juan',
+      lastName: 'Perez',
+      isAdmin: false,
+      isEnabled: false
+    },
+    message: 'User was disabled successfully'
+  };
+  const authResponse = {
+    responseCode: 200,
+    data: {
+      email: 'test@email.com',
+      disabled: true,
+    },
+    message: 'User was disabled successfully'
   };
 
-  let userService = {};
-  userService.toggleEnable = sandbox.stub();
-  userService
-    .toggleEnable
-    .returns(Promise.resolve(userServiceResponse));
+  userService.toggleEnable.returns(
+    Promise.resolve(userServiceResponse)
+  );
 
-  const setupDBService = getSetupDBService(userService);
+  authenticationService.changeAvailability.returns(
+    Promise.resolve(authResponse)
+  );
 
-  userController = getController(setupDBService);
+  userController = getController();
 
   await userController.remove(req, res);
 
@@ -322,12 +305,4 @@ test.serial('Remove user: success response', async t => {
     'Expected response status with success response'
   );
   t.true(res.json.called, 'Expected response json was executed');
-  t.true(
-    res.json.calledWith({
-      status: baseController.successStatus,
-      data: userServiceResponse.data,
-      message: userServiceResponse.message
-    }),
-    'Expected response json was executed'
-  );
 });

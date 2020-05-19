@@ -13,11 +13,13 @@ const setupBaseController = require('./../../../../../api/controllers/v1/base.co
 let sandbox = null;
 
 let usersController;
+const userService = {};
 let baseController;
 
 test.beforeEach(() => {
   sandbox = sinon.createSandbox();
 
+  userService.doList = sandbox.stub();
   baseController = new setupBaseController();
 });
 
@@ -25,38 +27,13 @@ test.afterEach(() => {
   sandbox && sandbox.restore();
 });
 
-function getSetupDBService(userService) {
-  const getMockProviders = () => {
-    return {
-      clientAuth: sinon.stub(),
-      adminAuth: sinon.stub(),
-      dbInstance: sinon.stub(),
-      storage: () => {
-        return {
-          bucket: sinon.stub()
-        };
-      }
-    };
-  };
-
-  return proxyquire('./../../../../../services', {
-    './../providers': getMockProviders,
-    './auth.codes.service': () => {},
-    './user.service': () => userService,
-    './attendees.service': () => {},
-    './events.service': () => {},
-    './authentication.service': () => {},
-    './roles.service': () => {},
-    './headquarters.service': () => {},
-    './storage.service': () => {},
-    './accounts.service': () => {},
-    './transactions.service': () => {}
-  });
-}
-
-function getController(allServices) {
+const getController = () => {
   return proxyquire('./../../../../../api/controllers/v1/users/users.controller', {
-    './../../../../services': allServices
+    './../../../../services/service.container': () => {
+      return {
+        doList: userService.doList
+      };
+    }
   });
 }
 
@@ -71,16 +48,10 @@ test.serial('Get all users', async t => {
     data: [],
     message: ''
   };
+  
+  userService.doList.returns(Promise.resolve(userServiceResponse));
 
-  let userService = {};
-  userService.doList = sandbox.stub();
-  userService
-    .doList
-    .returns(Promise.resolve(userServiceResponse));
-
-  const setupDBService = getSetupDBService(userService);
-
-  usersController = getController(setupDBService);
+  usersController = getController();
 
   await usersController.get(req, res);
 

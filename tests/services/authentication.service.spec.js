@@ -15,20 +15,27 @@ test.beforeEach(() => {
   adminInstanceStub = {};
 
   adminInstanceStub.revokeRefreshTokens = sandbox.stub();
-  adminInstanceStub.revokeRefreshTokens
-    .returns(Promise.resolve({}));
+  adminInstanceStub.revokeRefreshTokens.returns(
+    Promise.resolve({})
+  );
+  
   adminInstanceStub.getUser = sandbox.stub();
-  adminInstanceStub.getUser
-    .returns(Promise.resolve({
+  adminInstanceStub.getUser.returns(
+    Promise.resolve({
       tokensValidAfterTime: new Date().toISOString()
-    }));
+    })
+  );
+  
   adminInstanceStub.ref = sandbox.stub();
-  adminInstanceStub.ref
-    .returns({
+  adminInstanceStub.ref.returns(
+    {
       set: () => {
         return Promise.resolve({});
       }
-    });
+    }
+  );
+  
+  adminInstanceStub.createUser = sandbox.stub();
 
 });
 
@@ -36,7 +43,7 @@ test.afterEach(() => {
   sandbox && sandbox.restore();
 });
 
-test.serial('Change password using admin sdk: success response', async t => {
+test.serial('Update user: change Password | Success response', async t => {
   const userId = 'pmBhQP2XYWQsdPB5g45pasa4teasdaTwYzM3uH22';
   const newPassword = 'newPassword';
 
@@ -66,7 +73,7 @@ test.serial('Change password using admin sdk: success response', async t => {
   t.is(result['responseCode'], 200, 'Expected 500 error response');
 });
 
-test.serial('Change password using admin sdk: error response', async t => {
+test.serial('Update user: change Password | Error response', async t => {
   const userId = 'pmBhQP2XYWQsdPB5g45pasa4teasdaTwYzM3uH22';
   const newPassword = 'newPassword';
 
@@ -95,4 +102,26 @@ test.serial('Revoke token', async t => {
 
   t.is(authenticationResponse.hasOwnProperty('message'), true, 'Expected message key');
   t.is(authenticationResponse.hasOwnProperty('data'), true, 'Expected data key');
+});
+
+test.serial('Create authentication user: success response', async t => {
+  const userData = {
+    email: 'email@test.com',
+    emailVerified: false,
+    password: 'password',
+    displayName: 'Juan Perez',
+    disabled: false
+  };
+
+  adminInstanceStub.createUser.returns(
+    Promise.resolve({uid: 'ThisIsAUserId'})
+  );
+
+  authenticationService = setupAuthenticationService(adminInstanceStub);
+
+  const newAuthUserResponse = await authenticationService.createUser(userData);
+
+  t.is(Object.prototype.hasOwnProperty.call(newAuthUserResponse, 'message'), true, 'Expected message key');
+  t.is(Object.prototype.hasOwnProperty.call(newAuthUserResponse, 'data'), true, 'Expected data key');
+  t.is(Object.prototype.hasOwnProperty.call(newAuthUserResponse['data'], 'uid'), true, 'Expected data key');
 });

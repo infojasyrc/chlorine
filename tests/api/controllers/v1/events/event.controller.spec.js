@@ -14,12 +14,18 @@ let sandbox = null;
 
 let eventController;
 let eventsService = null;
+const mockStorageService = {};
 let baseController;
 
 test.beforeEach(() => {
   sandbox = sinon.createSandbox();
 
   eventsService = {};
+  eventsService.findById = sandbox.stub();
+  eventsService.remove = sandbox.stub();
+  eventsService.addAttendees = sandbox.stub();
+
+  mockStorageService.eraseList = sandbox.stub();
 
   baseController = new setupBaseController();
 });
@@ -28,42 +34,25 @@ test.afterEach(() => {
   sandbox && sandbox.restore();
 });
 
-function getSetupDBService(eventsService, storageService) {
-  const getMockProviders = () => {
-    return {
-      clientAuth: sinon.stub(),
-      adminAuth: sinon.stub(),
-      dbInstance: sinon.stub(),
-      storage: () => {
-        return {
-          bucket: sinon.stub()
-        };
-      }
-    };
-  };
-
-  const mockStorageService = storageService ? storageService : {};
-
-  return proxyquire('./../../../../../services', {
-    './../providers': getMockProviders,
-    './auth.codes.service': () => {},
-    './user.service': () => {},
-    './attendees.service': () => {},
-    './events.service': () => eventsService,
-    './authentication.service': () => {},
-    './roles.service': () => {},
-    './headquarters.service': () => {},
-    './storage.service': () => mockStorageService,
-    './accounts.service': () => {},
-    './transactions.service': () => {}
-  });
-}
-
-function getController(allServices) {
+const getController = service => {
   return proxyquire('./../../../../../api/controllers/v1/events/event.controller', {
-    './../../../../services': allServices
+    './../../../../services/service.container': serviceName => {
+      switch (serviceName) {
+        case 'events':
+        default:
+          return {
+            addAttendees: service.addAttendees,
+            findById: service.findById,
+            remove: service.remove
+          };
+        case 'storage':
+          return {
+            eraseList: mockStorageService.eraseList
+          };
+      }
+    }
   });
-}
+};
 
 test.serial('Check get event: validate params', async t => {
   const req = mockRequest({
@@ -71,9 +60,7 @@ test.serial('Check get event: validate params', async t => {
   });
   const res = mockResponse();
 
-  const setupDBService = getSetupDBService(eventsService);
-
-  eventController = getController(setupDBService);
+  eventController = getController(eventsService);
 
   await eventController.get(req, res);
 
@@ -98,15 +85,12 @@ test.serial('Check get event: retrieve event', async t => {
     responseCode: 200
   };
 
-  eventsService.findById = sandbox.stub();
   eventsService
     .findById
     .withArgs(eventId)
     .returns(Promise.resolve(eventServiceResponse));
 
-  const setupDBService = getSetupDBService(eventsService);
-
-  eventController = getController(setupDBService);
+  eventController = getController(eventsService);
 
   await eventController.get(req, res);
 
@@ -130,15 +114,12 @@ test.serial('Check get event: catch error', async t => {
   });
   const res = mockResponse();
 
-  eventsService.findById = sandbox.stub();
   eventsService
     .findById
     .withArgs(eventId)
     .returns(Promise.reject());
 
-  const setupDBService = getSetupDBService(eventsService);
-
-  eventController = getController(setupDBService);
+  eventController = getController(eventsService);
 
   await eventController.get(req, res);
 
@@ -176,15 +157,12 @@ test.serial('Add attendees: success response', async t => {
     message: ''
   };
 
-  eventsService.addAttendees = sandbox.stub();
   eventsService
     .addAttendees
     .withArgs(eventId, attendees)
     .returns(Promise.resolve(eventServiceResponse));
 
-  const setupDBService = getSetupDBService(eventsService);
-
-  eventController = getController(setupDBService);
+  eventController = getController(eventsService);
 
   await eventController.addAttendees(req, res);
 
@@ -220,18 +198,15 @@ test.serial('Delete event: success response and no images', async t => {
   });
   const res = mockResponse();
 
-  eventsService.findById = sandbox.stub();
   eventsService.findById
     .withArgs(eventId)
     .returns(Promise.resolve(infoEventServiceResponse));
-  eventsService.remove = sandbox.stub();
+
   eventsService.remove
     .withArgs(eventId)
     .returns(Promise.resolve(deleteEventServiceResponse));
 
-  const setupDBService = getSetupDBService(eventsService);
-
-  eventController = getController(setupDBService);
+  eventController = getController(eventsService);
 
   await eventController.remove(req, res);
 
@@ -257,7 +232,6 @@ test.serial('Delete event: success response with images', async t => {
     message: 'Event removed successfully',
     responseCode: 200
   };
-  let storageService = {};
 
   const req = mockRequest({
     params: {
@@ -266,20 +240,15 @@ test.serial('Delete event: success response with images', async t => {
   });
   const res = mockResponse();
 
-  eventsService.findById = sandbox.stub();
   eventsService.findById
     .withArgs(eventId)
     .returns(Promise.resolve(infoEventServiceResponse));
-  eventsService.remove = sandbox.stub();
+
   eventsService.remove
     .withArgs(eventId)
     .returns(Promise.resolve(deleteEventServiceResponse));
 
-  storageService.eraseList = sandbox.stub();
-
-  const setupDBService = getSetupDBService(eventsService, storageService);
-
-  eventController = getController(setupDBService);
+  eventController = getController(eventsService);
 
   await eventController.remove(req, res);
 
@@ -305,19 +274,16 @@ test.serial('Delete event: error response', async t => {
   });
   const res = mockResponse();
 
-  eventsService.findById = sandbox.stub();
   eventsService.findById
     .withArgs(eventId)
     .returns(Promise.resolve(infoEventServiceResponse));
-  eventsService.remove = sandbox.stub();
+
   eventsService
     .remove
     .withArgs(eventId)
     .returns(Promise.reject());
 
-  const setupDBService = getSetupDBService(eventsService);
-
-  eventController = getController(setupDBService);
+  eventController = getController(eventsService);
 
   await eventController.remove(req, res);
 

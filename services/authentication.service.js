@@ -7,22 +7,60 @@ module.exports = (adminInstance) => {
   const adminAuth = adminInstance;
   const baseService = new setupBaseService();
 
-  const changePasswordUsingAdminSDK = async (userId, newPassword) => {
-    try {
-      const response = await adminAuth.updateUser(userId, {
-        password: newPassword
-      });
+  const updateUser = async (userId, userData) => {
+    let response;
 
-      baseService.returnData.data = response;
-      baseService.returnData.message = 'Change password successfully';
+    try {
+      const updateResponse = await adminAuth.updateUser(userId, userData);
+
+      const successMessage = 'User information updated successfully';
+      response = baseService.getSuccessResponse(updateResponse, successMessage);
     } catch (err) {
-      const errorMessage = 'Error updating user password';
+      const errorMessage = 'Error updating user';
       console.error(errorMessage, err);
-      baseService.returnData.message = errorMessage;
-      baseService.returnData.responseCode = 500;
+      response = baseService.getErrorResponse(errorMessage);
     }
 
-    return baseService.returnData;
+    return response;
+  };
+
+  const changePasswordUsingAdminSDK = async (userId, newPassword) => {
+    return await updateUser(userId, {
+      password: newPassword
+    });
+  };
+
+  /**
+   * Enable or Disable user
+   * @param {String} userId 
+   * @param {Boolean} availability 
+   */
+  const changeAvailability = async (userId, availability) => {
+    return await updateUser(userId, {
+      disabled: availability
+    });
+  };
+
+  /**
+   * Create an authentication user
+   * @param {Object} userData 
+   * @returns {Object}
+   */
+  const createUser = async userData => {
+    let response;
+
+    try {
+      const authResponse = await adminAuth.createUser(userData);
+      const successMessage = 'Authentication created successfully';
+      response = baseService.getSuccessResponse({...authResponse}, successMessage);
+
+    } catch (error) {
+      const errorMessage = 'Error creating user auth';
+      console.error(errorMessage, error);
+      response = baseService.getErrorResponse(errorMessage);
+    }
+
+    return response;
   };
 
   const revokeToken = async (userId) => {
@@ -71,7 +109,9 @@ module.exports = (adminInstance) => {
   };
 
   return {
+    changeAvailability,
     changePasswordUsingAdminSDK,
+    createUser,
     revokeToken,
     verifyToken
   };

@@ -2,53 +2,42 @@
 
 const setupBaseService = require('./base.service');
 
-module.exports = (adminInstance, dbInstance) => {
+module.exports = dbInstance => {
 
-  const adminAuth = adminInstance;
   const collection = dbInstance.collection('users');
 
   let baseService = new setupBaseService();
 
-  async function create(userData) {
-    let newUserResponse = null;
+  /**
+   * Create user document
+   * @param {Object} userData 
+   * @param {String|null} uid 
+   */
+  const create = async (userData, uid = null) => {
+    let response;
+    const newUserData = {
+      ...userData,
+      userId: uid
+    };
 
     try {
-      let newUserAuthentication = await adminAuth.createUser({
-        email: userData.email,
-        emailVerified: false,
-        password: userData.password,
-        displayName: userData.name + ' ' + userData.lastName,
-        disabled: false
-      });
+      const newUserDoc = await collection.add(newUserData);
+      newUserData.id = newUserDoc.id;
+      const successMessage = 'User was successfully created';
 
-      newUserResponse = {
-        userId: newUserAuthentication.uid,
-        email: userData.email,
-        name: userData.name,
-        lastName: userData.lastName,
-        isAdmin: userData.isAdmin,
-        avatarUrl: '',
-        isEnabled: true,
-        role: userData.role
-      };
-
-      let newUserReference = await collection.add(newUserResponse);
-      newUserResponse.id = newUserReference.id;
-
-      baseService.returnData.message = 'User was successfully created.';
-    } catch (err) {
-      console.error('error: ', err);
-      baseService.returnData.responseCode = 500;
-      baseService.returnData.message = 'Error adding a user';
-    } finally {
-      baseService.returnData.data = newUserResponse;
+      response = baseService.getSuccessResponse(newUserData, successMessage);
+    } catch (error) {
+      const errorMessage = 'Error creating user document';
+      console.error(errorMessage, error);
+      response = baseService.getErrorResponse(errorMessage);
     }
 
-    return baseService.returnData;
-  }
+    return response;
+  };
 
-  async function doList() {
+  const doList = async () => {
     let allUsers = [];
+    let response;
 
     try {
       let userRefSnapshot = await collection.get();
@@ -59,45 +48,43 @@ module.exports = (adminInstance, dbInstance) => {
         allUsers.push(userData);
       });
 
-      baseService.returnData.message = 'Getting all user list information successfully.';
+      const successMessage = 'Getting all user list information successfully.';
+      response = baseService.getSuccessResponse(allUsers, successMessage);
     } catch (err) {
-      console.error('Error getting documents', err);
-      baseService.returnData.responseCode = 500;
-      baseService.returnData.message = 'Error getting user list information';
-    } finally {
-      baseService.returnData.data = allUsers;
+      const errorMessage = 'Error getting user list information';
+      console.error(errorMessage, err);
+      response = baseService.getErrorResponse(errorMessage);
     }
 
-    return baseService.returnData;
-  }
+    return response;
+  };
 
-  async function findById(id) {
+  const findById = async id => {
     let user = null;
+    let response;
 
     try {
-      let userRefSnapshot = await collection
-        .doc(id)
-        .get();
+      let userRefSnapshot = await collection.doc(id).get();
 
       if (userRefSnapshot.exists) {
         user = userRefSnapshot.data();
       }
 
       user.id = id;
-      baseService.returnData.message = 'Getting user information successfully';
+      const successMessage = 'Getting user information successfully';
+      response = baseService.getSuccessResponse(user, successMessage);
     } catch (err) {
-      console.error('Error getting user information', err);
-      baseService.returnData.responseCode = 500;
-      baseService.returnData.message = 'Error getting user information';
-    } finally {
-      baseService.returnData.data = user;
+      const errorMessage = 'Error getting user information';
+      console.error(errorMessage, err);
+      response = baseService.getErrorResponse(errorMessage);
     }
 
-    return baseService.returnData;
-  }
+    return response;
+  };
 
-  async function findByUserId(userId) {
+  const findByUserId = async userId => {
     let user = null;
+    let response;
 
     try {
       let userRefSnapshot = await collection
@@ -110,56 +97,48 @@ module.exports = (adminInstance, dbInstance) => {
         user.id = userRefSnapshot.docs[0].id;
       }
 
-      baseService.returnData.status = true;
-      baseService.returnData.responseCode = 200;
-      baseService.returnData.message = 'Getting user information successfully';
+      const successMessage = 'Getting user information successfully';
+      response = baseService.getSuccessResponse(user, successMessage);
     } catch (err) {
-      console.error('Error getting user information', err);
-      baseService.returnData.responseCode = 500;
-      baseService.returnData.message = 'Error getting user information';
+      const errorMessage = 'Error getting user information';
+      console.error(errorMessage, err);
+      response = baseService.getErrorResponse(errorMessage);
     }
 
-    baseService.returnData.data = user;
-
-    return baseService.returnData;
-  }
+    return response;
+  };
 
   /**
    * Disable user for removing operation
    * @param {String} id
    */
-  async function toggleEnable(id) {
+  const toggleEnable = async id => {
+    let response;
     try {
-      let userInfoRef = await collection
-        .doc(id)
-        .get();
+      const userInfoRef = await collection.doc(id).get();
 
       const userData = userInfoRef.data();
+      userData.isEnabled = !userData.isEnabled;
 
-      await collection
-        .doc(id)
-        .update({
-          isEnabled: !userData.isEnabled
-        });
-
-      await adminAuth.updateUser(userData.userId, {
-        disabled: !userData.isEnabled
+      await collection.doc(id).update({
+        isEnabled: userData.isEnabled
       });
 
-      baseService.returnData.message = 'User was deleted successfully';
+      const successMessage = 'User was disabled successfully';
+      response = baseService.getSuccessResponse(userData, successMessage);
+
     } catch (err) {
-      console.error('Error removing a user: ', err);
-      baseService.returnData.responseCode = 500;
-      baseService.returnData.message = 'Error removing a user';
-    } finally {
-      baseService.returnData.data = {};
+      const errorMessage = 'Error removing a user';
+      console.error(errorMessage, err);
+      response = baseService.getErrorResponse(errorMessage);
     }
 
-    return baseService.returnData;
-  }
+    return response;
+  };
 
-  async function update(userId, userData) {
+  const update = async (userId, userData) => {
     let userResponse = null;
+    let response;
 
     try {
       await collection.doc(userId).update(userData);
@@ -170,17 +149,16 @@ module.exports = (adminInstance, dbInstance) => {
         id: userId
       };
 
-      baseService.returnData.message = 'User was updated successfully';
+      const successMessage = 'User was updated successfully';
+      response = baseService.getSuccessResponse(userResponse, successMessage);
     } catch (err) {
+      const errorMessage = 'Error updating a user';
       console.error('Error updating a user: ', err);
-      baseService.returnData.responseCode = 500;
-      baseService.returnData.message = 'Error updating a user';
+      response = baseService.getErrorResponse(errorMessage);
     }
 
-    baseService.returnData.data = userResponse;
-
-    return baseService.returnData;
-  }
+    return response;
+  };
 
   return {
     create,

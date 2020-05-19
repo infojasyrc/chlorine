@@ -1,10 +1,11 @@
 'use strict';
 
 const setupBaseController = require('../base.controller');
-const setupDBService = require('../../../../services');
+const serviceContainer = require('../../../../services/service.container');
 
 let baseController = new setupBaseController();
-const dbService = setupDBService();
+const userService = serviceContainer('users');
+const authenticationService = serviceContainer('authentication');
 
 const get = async (request, response) => {
   if (!request.params.id) {
@@ -18,7 +19,7 @@ const get = async (request, response) => {
   let requestedUserId = request.params.id;
 
   try {
-    let userData = await dbService.userService.findById(requestedUserId);
+    let userData = await userService.findById(requestedUserId);
 
     responseCode = userData.responseCode;
     responseData = baseController.getSuccessResponse(
@@ -46,7 +47,7 @@ const getByUid = async (request, response) => {
       });
   }
 
-  const userData = await dbService.userService.findByUserId(request.body.uid);
+  const userData = await userService.findByUserId(request.body.uid);
   const responseData = {
     status: 'OK',
     data: userData.data,
@@ -60,16 +61,16 @@ const post = async (request, response) => {
   if (!request.body.name ||
     !request.body.lastName ||
     !request.body.email ||
-    !request.body.role
+    !request.body.role ||
+    !request.body.uid
   ) {
-    return response
-      .status(400)
-      .json(baseController.getErrorResponse('Parameters are missing'));
+    return response.status(400).json(
+      baseController.getErrorResponse('Parameters are missing')
+    );
   }
 
   const userData = {
     email: request.body.email,
-    password: '12345678',
     name: request.body.name,
     lastName: request.body.lastName,
     isAdmin: request.body.isAdmin,
@@ -80,7 +81,7 @@ const post = async (request, response) => {
   let responseData;
 
   try {
-    const newUserData = await dbService.userService.create(userData);
+    const newUserData = await userService.create(userData, request.body.uid);
 
     responseCode = newUserData.responseCode;
     responseData = baseController.getSuccessResponse(
@@ -135,7 +136,7 @@ const update = async (request, response) => {
   let responseData;
 
   try {
-    const updatedData = await dbService.userService.update(userId, userData);
+    const updatedData = await userService.update(userId, userData);
 
     responseCode = updatedData.responseCode;
     responseData = baseController.getSuccessResponse(
@@ -162,14 +163,17 @@ const remove = async (request, response) => {
   let responseData;
 
   try {
-    const data = await dbService
-      .userService
-      .toggleEnable(request.params.id);
+    const userDocResponse = await userService.toggleEnable(request.params.id);
+    
+    const disabledAuthResponse = await authenticationService.changeAvailability(
+      userDocResponse.data.userId,
+      userDocResponse.data.isEnabled
+    );
 
-    responseCode = data.responseCode;
+    responseCode = disabledAuthResponse.responseCode;
     responseData = baseController.getSuccessResponse(
-      data.data,
-      data.message
+      disabledAuthResponse.data,
+      disabledAuthResponse.message
     );
   } catch (err) {
     responseCode = 500;
@@ -197,7 +201,7 @@ const changePassword = async (request, response) => {
 
   try {
 
-    const updatedUserData = await dbService.authenticationService.changePasswordUsingAdminSDK(
+    const updatedUserData = await authenticationService.changePasswordUsingAdminSDK(
       request.body.uid,
       request.body.newPassword
     );

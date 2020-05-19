@@ -1,10 +1,11 @@
 'use strict';
 
 const setupBaseController = require('../base.controller');
-const setupDBService = require('../../../../services');
+const serviceContainer = require('../../../../services/service.container');
 
 let baseController = new setupBaseController();
-const dbService = setupDBService();
+const eventsService = serviceContainer('events');
+const storageService = serviceContainer('storage');
 
 const get = async (request, response) => {
   if (!request.params.id) {
@@ -16,7 +17,7 @@ const get = async (request, response) => {
   const id = request.params.id;
 
   try {
-    let eventResponse = await dbService.eventsService.findById(id);
+    let eventResponse = await eventsService.findById(id);
 
     return response
       .status(eventResponse.responseCode)
@@ -65,7 +66,7 @@ const post = async (request, response) => {
     '';
 
   try {
-    const eventResponse = await dbService.eventsService.create(eventData);
+    const eventResponse = await eventsService.create(eventData);
 
     responseData = baseController.getSuccessResponse(eventResponse.data, eventResponse.message);
     responseCode = eventResponse.responseCode;
@@ -125,7 +126,7 @@ const update = async (request, response) => {
 
   try {
 
-    const eventResponse = await dbService.eventsService.update(request.params.id, eventData);
+    const eventResponse = await eventsService.update(request.params.id, eventData);
 
     responseCode = eventResponse.responseCode;
     responseData = baseController.getSuccessResponse(eventResponse.data, eventResponse.message);
@@ -153,7 +154,7 @@ const updateImages = async (request, response) => {
   const id = request.params.id;
 
   try {
-    const eventResponse = await dbService.eventsService.updateImages(id, request.body.images);
+    const eventResponse = await eventsService.updateImages(id, request.body.images);
 
     responseCode = eventResponse.responseCode;
     responseData = baseController.getSuccessResponse(eventResponse.data, eventResponse.message);
@@ -181,7 +182,7 @@ const deleteImage = async (request, response) => {
   let responseCode;
 
   try {
-    const deleteResponse = await dbService.eventsService.deleteImage(id, idImage);
+    const deleteResponse = await eventsService.deleteImage(id, idImage);
 
     responseCode = deleteResponse.responseCode;
     responseData = baseController.getSuccessResponse(deleteResponse.data, deleteResponse.message);
@@ -210,7 +211,7 @@ const open = async (request, response) => {
   const id = request.params.id;
 
   try {
-    const openResponse = await dbService.eventsService.open(id);
+    const openResponse = await eventsService.open(id);
 
     responseCode = openResponse.responseCode;
     responseData = baseController.getSuccessResponse(openResponse.data, openResponse.message);
@@ -237,7 +238,7 @@ const pause = async (request, response) => {
   let responseData;
 
   try {
-    const pauseResponse = await dbService.eventsService.pause(id);
+    const pauseResponse = await eventsService.pause(id);
 
     responseCode = pauseResponse.responseCode;
     responseData = baseController.getSuccessResponse(pauseResponse.data, pauseResponse.message);
@@ -265,7 +266,7 @@ const close = async (request, response) => {
   let responseData;
 
   try {
-    const closeResponse = await dbService.eventsService.close(id);
+    const closeResponse = await eventsService.close(id);
 
     responseCode = closeResponse.responseCode;
     responseData = baseController.getSuccessResponse(closeResponse.data, closeResponse.message);
@@ -295,7 +296,7 @@ const addAttendees = async (request, response) => {
   let responseData;
 
   try {
-    const addAttendeesResponse = await dbService.eventsService.addAttendees(id, attendees);
+    const addAttendeesResponse = await eventsService.addAttendees(id, attendees);
 
     responseCode = addAttendeesResponse.responseCode;
     responseData = baseController.getSuccessResponse(
@@ -327,11 +328,11 @@ const remove = async (request, response) => {
   let responseData;
 
   try {
-    const eventInfo = await dbService.eventsService.findById(id);
-    const eventResponse = await dbService.eventsService.remove(id);
+    const eventInfo = await eventsService.findById(id);
+    const eventResponse = await eventsService.remove(id);
     // Remove all images related to an event
     if (eventInfo.data.images && eventInfo.data.images.length > 0) {
-      await dbService.storageService.eraseList(eventInfo.data.images);
+      await storageService.eraseList(eventInfo.data.images);
     }
 
     responseCode = eventResponse.responseCode;
