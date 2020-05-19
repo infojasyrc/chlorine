@@ -50,7 +50,7 @@ module.exports = function setupEventsService(dbInstance) {
 
     try {
 
-      let rootQuery = collection.where('year', '==', parseInt(year));
+      let rootQuery = collection.where('year', '==', parseInt(year, 10));
 
       if (headquarterId) {
         rootQuery = rootQuery.where('headquarter.id', '==', headquarterId);
@@ -59,7 +59,7 @@ module.exports = function setupEventsService(dbInstance) {
       const dataSnapshot = await rootQuery.get();
 
       dataSnapshot.forEach((doc) => {
-        let event = {
+        const event = {
           id: doc.id,
           ...doc.data()
         };

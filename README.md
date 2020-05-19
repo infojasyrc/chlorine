@@ -6,40 +6,38 @@ This project will handle a REST API to handle events: Create, update, remove and
 From Firebase, we will use:
 
 * Authentication
-* Cloud Firestore database
+* Firestore
 * Storage
-* Functions
 
 Dependencies
 ===
 
-For this application, we are using Nodejs v8.15.0. (You will check .nvmrc file)
+For this application, we are using Nodejs v10. (You will check .nvmrc file)
 
 For MacOS:
 
 ```
 - brew install nvm
-- nvm install v8.15.0
+- nvm install v10
 ```
 
-For Windows:
+Local Development with reload
+===
 
 ```
-- choco install nvm
-- nvm install v8.15.0
+- npm run dev
 ```
 
 Local Development
 ===
 
 ```
-- node index.js
+- npm run start
 ```
 
 Available endpoints for local development
 ===
 
-using ```node index.js```
 ```
 - get http://localhost:5001/api/healthcheck/
 - get http://localhost:5001/api/users
@@ -52,29 +50,14 @@ using ```node index.js```
 Folder structure
 ===
 
-database: This folder will group all database functions
+services: This folder will group all services
+models: This folder will group all models
 api: This folder will group all functions to handle the enpoints.
 
 For Debugging
 ===
 
-Add the following information for launch.json in .vscode folder
-
-```
-{
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Launch Program",
-      "program": "${workspaceFolder}/index.js"
-    }
-  ]
-}
-```
-
-However, on MacOS, if you use nvm within a specific version, please add the following:
+On MacOS, if you use nvm within a specific version, please add the following:
 
 ```
 {
@@ -85,7 +68,7 @@ However, on MacOS, if you use nvm within a specific version, please add the foll
       "request": "launch",
       "name": "Launch Program",
       "program": "${workspaceFolder}/index.js",
-      "runtimeExecutable": "${env:HOME}/.nvm/versions/node/v8.15.0/bin/node"
+      "runtimeExecutable": "${env:HOME}/.nvm/versions/node/{Specific version}/bin/node"
     }
   ]
 }

@@ -14,11 +14,11 @@ const setupSessionService = require('./session.service');
 const setupTransactionsService = require('./transactions.service');
 const setupAuthCodeService = require('./auth.codes.service');
 
-module.exports = function () {
+module.exports = () => {
   const serviceProviders = setupServiceProviders();
   
   const authenticationService = setupAuthenticationService(serviceProviders.adminAuth);
-  const userService = setupUserService(serviceProviders.adminAuth, serviceProviders.dbInstance);
+  const userService = setupUserService(serviceProviders.dbInstance);
   const attendeesService = setupAttendeesService(serviceProviders.dbInstance);
   const eventsService = setupEventsService(serviceProviders.dbInstance);
   const rolesService = setupRolesService(serviceProviders.dbInstance);

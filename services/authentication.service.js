@@ -2,48 +2,65 @@
 
 const setupBaseService = require('./base.service');
 
-module.exports = function setupAuthenticationService(adminInstance) {
+module.exports = (adminInstance) => {
 
   const adminAuth = adminInstance;
   const baseService = new setupBaseService();
 
-  const checkLogin = async (email, password) => {
-    let flagAuthentication = false;
+  const updateUser = async (userId, userData) => {
+    let response;
 
     try {
-      let loginInfo = await login({
-        email: email,
-        password: password
-      });
-      baseService.returnData.message = loginInfo.message;
-      flagAuthentication = loginInfo.data.uid !== '';
+      const updateResponse = await adminAuth.updateUser(userId, userData);
+
+      const successMessage = 'User information updated successfully';
+      response = baseService.getSuccessResponse(updateResponse, successMessage);
     } catch (err) {
-      console.error('Error on reauthentication process: ', err);
-      baseService.returnData.message = 'Error on reauthentication process';
-      baseService.returnData.responseCode = 500;
-    } finally {
-      baseService.returnData.data = flagAuthentication;
+      const errorMessage = 'Error updating user';
+      console.error(errorMessage, err);
+      response = baseService.getErrorResponse(errorMessage);
     }
 
-    return baseService.returnData;
+    return response;
   };
 
   const changePasswordUsingAdminSDK = async (userId, newPassword) => {
-    try {
-      const response = await adminAuth.updateUser(userId, {
-        password: newPassword
-      });
+    return await updateUser(userId, {
+      password: newPassword
+    });
+  };
 
-      baseService.returnData.data = response;
-      baseService.returnData.message = 'Change password successfully';
-    } catch (err) {
-      const errorMessage = 'Error updating user password';
-      console.error(errorMessage, err);
-      baseService.returnData.message = errorMessage;
-      baseService.returnData.responseCode = 500;
+  /**
+   * Enable or Disable user
+   * @param {String} userId 
+   * @param {Boolean} availability 
+   */
+  const changeAvailability = async (userId, availability) => {
+    return await updateUser(userId, {
+      disabled: availability
+    });
+  };
+
+  /**
+   * Create an authentication user
+   * @param {Object} userData 
+   * @returns {Object}
+   */
+  const createUser = async userData => {
+    let response;
+
+    try {
+      const authResponse = await adminAuth.createUser(userData);
+      const successMessage = 'Authentication created successfully';
+      response = baseService.getSuccessResponse({...authResponse}, successMessage);
+
+    } catch (error) {
+      const errorMessage = 'Error creating user auth';
+      console.error(errorMessage, error);
+      response = baseService.getErrorResponse(errorMessage);
     }
 
-    return baseService.returnData;
+    return response;
   };
 
   const revokeToken = async (userId) => {
@@ -92,8 +109,9 @@ module.exports = function setupAuthenticationService(adminInstance) {
   };
 
   return {
-    checkLogin,
+    changeAvailability,
     changePasswordUsingAdminSDK,
+    createUser,
     revokeToken,
     verifyToken
   };

@@ -11,12 +11,21 @@
     "ecmaVersion": 2018,
     "sourceType": "module"
   },
+  "plugins": [
+    "promise"
+  ],
   "rules": {
-    "quotes": ["error", "single"],
-    "semi": ["error", "always"],
-    "eqeqeq": "warn",
+    "eqeqeq": 2,
+    // Require error handling in callbacks
+    "handle-callback-err": 2,
     "no-console": 0,
-    "no-unused-vars": 0
+    "no-unused-vars": 0,
+    // Prefer using arrow functions for callbacks
+    "prefer-arrow-callback": 1,
+    // Warn against nested then() or catch() statements
+    "promise/no-nesting": 1,
+    "quotes": ["error", "single"],
+    "semi": ["error", "always"]
   },
   "overrides": [
     {

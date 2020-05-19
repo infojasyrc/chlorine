@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "Events Manager",
   "scripts": {
-    "generate:keys:dev": "cp services-config/app.prod.json services-config/app.json && cp services-config/app.web.prod.json services-config/app.web.json",
-    "generate:keys:test": "cp services-config/app.test.json services-config/app.json && cp services-config/app.web.test.json services-config/app.web.json",
+    "generate:keys:dev": "cp services-config/app.prod.json services-config/app.json",
+    "generate:keys:test": "cp services-config/app.test.json services-config/app.json",
     "dev": "npm run generate:keys:dev && nodemon index.js",
     "start": "npm run generate:keys:dev && node index.js",
     "test": "npm run generate:keys:test && nyc --reporter=lcov ava",
@@ -24,6 +24,7 @@
     "ava": "^3.6.0",
     "eslint": "^6.8.0",
     "eslint-plugin-promise": "^4.2.1",
+    "husky": "^4.2.5",
     "mock-req-res": "^1.1.4",
     "nodemon": "^2.0.3",
     "nyc": "^15.0.1",
@@ -41,5 +42,10 @@
     "morgan": "^1.10.0",
     "uuid": "^7.0.3",
     "xhr2": "^0.2.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint && npm run test"
+    }
   }
 }
