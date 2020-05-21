@@ -51,14 +51,47 @@ const resetPassword = async (request, response) => {
     );
   } catch (err) {
     responseCode = 500;
-    console.error('Error resetting password: ', err);
-    responseData = baseController.getErrorResponse('Error resetting password');
+    const errorMessage = 'Error resetting password';
+    console.error(errorMessage, err);
+    responseData = baseController.getErrorResponse(errorMessage);
+  }
+
+  return response.status(responseCode).json(responseData);
+};
+
+const create = async (request, response) => {
+  if (!request.body.email ||
+    !request.body.password ||
+    !request.body.name ||
+    !request.body.lastName
+  ) {
+    return response.status(400).json(
+      baseController.getErrorResponse('Parameters are missing')
+    );
+  }
+
+  try {
+    const authData = authenticationService.getModel(request.body);
+
+    const authenticationResponse = await authenticationService.createUser(authData);
+
+    responseCode = authenticationResponse.responseCode;
+    responseData = baseController.getSuccessResponse(
+      authenticationResponse.data,
+      authenticationResponse.message
+    );
+  } catch (error) {
+    responseCode = 500;
+    const errorMessage = 'Error creating authorization user';
+    console.error(errorMessage, error);
+    responseData = baseController.getErrorResponse(errorMessage);
   }
 
   return response.status(responseCode).json(responseData);
 };
 
 module.exports = {
+  create,
   revokeToken,
   resetPassword
 };
