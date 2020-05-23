@@ -10,10 +10,9 @@ class User {
     this.email = user.email;
     this.isAdmin = user.isAdmin || false;
     this.isSuperAdmin = user.isSuperAdmin || false;
-    this.userId = user.userId;
-    this.id = user.id || '';
+    this.uid = user.uid;
   }
 
 }
 
-export default User;
+module.exports = User;

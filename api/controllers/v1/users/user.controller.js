@@ -1,6 +1,7 @@
 'use strict';
 
 const setupBaseController = require('../base.controller');
+
 const serviceContainer = require('../../../../services/service.container');
 
 let baseController = new setupBaseController();
@@ -61,7 +62,6 @@ const post = async (request, response) => {
   if (!request.body.name ||
     !request.body.lastName ||
     !request.body.email ||
-    !request.body.role ||
     !request.body.uid
   ) {
     return response.status(400).json(
@@ -69,24 +69,17 @@ const post = async (request, response) => {
     );
   }
 
-  const userData = {
-    email: request.body.email,
-    name: request.body.name,
-    lastName: request.body.lastName,
-    isAdmin: request.body.isAdmin,
-    role: request.body.role
-  };
-
   let responseCode = 500;
   let responseData;
 
   try {
-    const newUserData = await userService.create(userData, request.body.uid);
+    const newUserData = userService.getModel(request.body);
+    const newUseDataResponse = await userService.create(newUserData);
 
-    responseCode = newUserData.responseCode;
+    responseCode = newUseDataResponse.responseCode;
     responseData = baseController.getSuccessResponse(
-      newUserData.data,
-      newUserData.message
+      newUseDataResponse.data,
+      newUseDataResponse.message
     );
   } catch (err) {
     console.error('Error creating a new user: ', err);
