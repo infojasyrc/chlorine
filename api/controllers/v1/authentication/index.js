@@ -6,5 +6,6 @@ const router = express.Router();
 
 router.post('/revoke-token', authenticationController.revokeToken);
 router.post('/reset-password', authenticationController.resetPassword);
+router.post('/create', authenticationController.create);
 
 module.exports = router;

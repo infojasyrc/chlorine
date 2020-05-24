@@ -1,5 +1,7 @@
 'use strict';
 
+const UserAuthentication = require('../../models/user-authentication');
+
 const test = require('ava');
 const sinon = require('sinon');
 
@@ -124,4 +126,19 @@ test.serial('Create authentication user: success response', async t => {
   t.is(Object.prototype.hasOwnProperty.call(newAuthUserResponse, 'message'), true, 'Expected message key');
   t.is(Object.prototype.hasOwnProperty.call(newAuthUserResponse, 'data'), true, 'Expected data key');
   t.is(Object.prototype.hasOwnProperty.call(newAuthUserResponse['data'], 'uid'), true, 'Expected data key');
+});
+
+test.serial('Get authentication model', t => {
+  const dataFromRequest = {
+    email: 'test@email.com',
+    password: 'ThisIsAGReatPassword',
+    name: 'Juan',
+    lastName: 'Perez'
+  };
+  
+  authenticationService = setupAuthenticationService(adminInstanceStub);
+
+  const model = authenticationService.getModel(dataFromRequest);
+
+  t.true(model instanceof UserAuthentication, 'Expected model to be an instance of User Authentication');
 });

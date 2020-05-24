@@ -1,6 +1,7 @@
 'use strict';
 
 const setupBaseService = require('./base.service');
+const User = require('./../models/user');
 
 module.exports = dbInstance => {
 
@@ -11,13 +12,11 @@ module.exports = dbInstance => {
   /**
    * Create user document
    * @param {Object} userData 
-   * @param {String|null} uid 
    */
-  const create = async (userData, uid = null) => {
+  const create = async userData => {
     let response;
     const newUserData = {
-      ...userData,
-      userId: uid
+      ...userData
     };
 
     try {
@@ -109,6 +108,14 @@ module.exports = dbInstance => {
   };
 
   /**
+   * Get user model
+   * @param {Object} data
+   */
+  const getModel = data => {
+    return new User(data);
+  };
+
+  /**
    * Disable user for removing operation
    * @param {String} id
    */
@@ -165,6 +172,7 @@ module.exports = dbInstance => {
     doList,
     findById,
     findByUserId,
+    getModel,
     toggleEnable,
     update
   };
