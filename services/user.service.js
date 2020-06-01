@@ -59,17 +59,19 @@ module.exports = dbInstance => {
   };
 
   const findById = async id => {
-    let user = null;
     let response;
 
     try {
-      let userRefSnapshot = await collection.doc(id).get();
+      const userRefSnapshot = await collection.doc(id).get();
 
-      if (userRefSnapshot.exists) {
-        user = userRefSnapshot.data();
+      if (!userRefSnapshot.exists) {
+        return baseService.getSuccessResponse({}, 'No existing data');
       }
+      const user = {
+        ...userRefSnapshot.data(),
+        id: id
+      };
 
-      user.id = id;
       const successMessage = 'Getting user information successfully';
       response = baseService.getSuccessResponse(user, successMessage);
     } catch (err) {
@@ -87,7 +89,7 @@ module.exports = dbInstance => {
 
     try {
       let userRefSnapshot = await collection
-        .where('userId', '==', userId)
+        .where('uid', '==', userId)
         .limit(1)
         .get();
 
