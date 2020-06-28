@@ -9,7 +9,6 @@ const {
 const proxyquire = require('proxyquire');
 
 const setupBaseController = require('../../../../../api/controllers/v1/base.controller');
-const setupUserService = require('./../../../../../services/user.service');
 
 let sandbox = null;
 
@@ -24,14 +23,13 @@ test.beforeEach(() => {
 
   const mockDBInstance = {};
   mockDBInstance.collection = sandbox.stub();
-  userService = setupUserService(mockDBInstance);
 
   mockUserService.findById = sandbox.stub();
   mockUserService.findByUserId = sandbox.stub();
   mockUserService.create = sandbox.stub();
   mockUserService.toggleEnable = sandbox.stub();
   mockUserService.update = sandbox.stub();
-  mockUserService.getModel = userService.getModel;
+  mockUserService.getModel = sandbox.stub();
 
   authenticationService.changePasswordUsingAdminSDK = sandbox.stub();
   authenticationService.changeAvailability = sandbox.stub();
@@ -221,7 +219,7 @@ test.serial('Update user: success response', async t => {
     data: {},
     message: 'Updating user successfully'
   };
-  
+
   mockUserService.update.returns(
     Promise.resolve(userServiceResponse)
   );

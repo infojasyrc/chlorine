@@ -2,7 +2,7 @@
 
 const setupServiceProviders = require('./../providers');
 
-const setupUserService = require('./user.service');
+const UserService = require('./user.service');
 const setupAttendeesService = require('./attendees.service');
 const setupEventsService = require('./events.service');
 const setupAuthenticationService = require('./authentication.service');
@@ -16,9 +16,9 @@ const setupAuthCodeService = require('./auth.codes.service');
 
 module.exports = () => {
   const serviceProviders = setupServiceProviders();
-  
+
   const authenticationService = setupAuthenticationService(serviceProviders.adminAuth);
-  const userService = setupUserService(serviceProviders.dbInstance);
+  const userService = new UserService(serviceProviders.dbInstance);
   const attendeesService = setupAttendeesService(serviceProviders.dbInstance);
   const eventsService = setupEventsService(serviceProviders.dbInstance);
   const rolesService = setupRolesService(serviceProviders.dbInstance);

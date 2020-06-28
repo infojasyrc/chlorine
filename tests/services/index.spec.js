@@ -12,12 +12,12 @@ test.beforeEach(() => {
 
   const getMockProviders = () => {
     return {
-      clientAuth: sinon.stub(),
-      adminAuth: sinon.stub(),
-      dbInstance: sinon.stub(),
+      clientAuth: sandbox.stub(),
+      adminAuth: sandbox.stub(),
+      dbInstance: sandbox.stub(),
       storage: () => {
         return {
-          bucket: sinon.stub()
+          bucket: sandbox.stub()
         };
       }
     };
@@ -26,7 +26,7 @@ test.beforeEach(() => {
   const setupDatabase = proxyquire('./../../services', {
     './../providers': getMockProviders,
     './auth.codes.service': () => {},
-    './user.service': () => {},
+    './user.service': sandbox.stub(),
     './attendees.service': () => {},
     './events.service': () => {},
     './authentication.service': () => {},

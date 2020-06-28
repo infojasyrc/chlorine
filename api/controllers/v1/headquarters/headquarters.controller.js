@@ -1,17 +1,17 @@
-'use strict';
+'use strict'
 
-const setupBaseController = require('../base.controller');
-const setupDBService = require('../../../../services');
+const setupBaseController = require('../base.controller')
+const serviceContainer = require('../../../../services/service.container')
 
-let baseController = new setupBaseController();
-const dbService = setupDBService();
+let baseController = new setupBaseController()
+const headquartersService = serviceContainer('headquarters')
 
 const get = async (request, response) => {
   let responseCode;
   let responseData;
 
   try {
-    const allData = await dbService.headquartersService.doList();
+    const allData = await headquartersService.doList();
     responseCode = allData.responseCode;
     responseData = baseController.getSuccessResponse(
       allData.data,

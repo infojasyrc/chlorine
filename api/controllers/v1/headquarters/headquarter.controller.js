@@ -1,39 +1,39 @@
-'use strict';
+'use strict'
 
-const setupBaseController = require('../base.controller');
-const setupDBService = require('../../../../services');
+const setupBaseController = require('../base.controller')
+const serviceContainer = require('../../../../services/service.container')
 
-let baseController = new setupBaseController();
-const dbService = setupDBService();
+let baseController = new setupBaseController()
+const headquartersService = serviceContainer('headquarters')
 
 const get = async (request, response) => {
   if (!request.params.id) {
-    return response
-      .status(400)
-      .json(baseController.getErrorResponse('Parameter is missing'));
+    return response.status(400).json(
+      baseController.getErrorResponse('Parameter is missing')
+    )
   }
 
-  let responseCode;
-  let responseData;
+  let responseCode = 500
+  let responseData
 
   try {
-    const headquarterData = await dbService.headquartersService.getHeadquarter(request.params.id);
-    responseCode = headquarterData.responseCode;
+    const headquarterData = await headquartersService.getHeadquarter(request.params.id)
+    responseCode = headquarterData.responseCode
     responseData = baseController.getSuccessResponse(
       headquarterData.data,
       headquarterData.message
-    );
+    )
   } catch (err) {
-    console.error('Error getting headquarter information: ', err);
-    responseCode = 500;
-    responseData = baseController.getErrorResponse('Error getting headquarter information');
+    const errorMessage = 'Error getting headquarter information'
+    /* eslint-disable no-console */
+    // console.error(errorMessage, err)
+    /* eslint-enable */
+    responseData = baseController.getErrorResponse(errorMessage)
   }
 
-  return response
-    .status(responseCode)
-    .json(responseData);
-};
+  return response.status(responseCode).json(responseData)
+}
 
 module.exports = {
   get
-};
+}

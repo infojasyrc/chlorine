@@ -1,23 +1,23 @@
 'use strict';
 
 const setupBaseController = require('../base.controller');
-const setupDBService = require('../../../../services');
+const serviceContainer = require('../../../../services/service.container');
 
 let baseController = new setupBaseController();
-const dbService = setupDBService();
+const rolesService = serviceContainer('roles');
 
 const get = async (request, response) => {
   if (!request.params.id) {
-    return response
-      .status(400)
-      .json(baseController.getErrorResponse('Parameter is missing'));
+    return response.status(400).json(
+      baseController.getErrorResponse('Parameter is missing')
+    );
   }
 
   let responseCode;
   let responseData;
 
   try {
-    const roleData = await dbService.rolesService.getRole(request.params.id);
+    const roleData = await rolesService.getRole(request.params.id);
 
     responseCode = roleData.responseCode;
     responseData = baseController.getSuccessResponse(
@@ -30,11 +30,9 @@ const get = async (request, response) => {
     responseData = baseController.getErrorResponse('Error getting role information');
   }
 
-  return response
-    .status(responseCode)
-    .json(responseData);
-};
+  return response.status(responseCode).json(responseData)
+}
 
 module.exports = {
   get
-};
+}
