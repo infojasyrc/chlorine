@@ -1,22 +1,22 @@
-'use strict';
+'use strict'
 
-const uuidGenerator = require('uuid/v4');
+const {v4: uuidGenerator} = require('uuid')
 
 class MockHeadquarter {
   constructor() {}
 
   static getBuenosAires() {
     return {
-      id: 'SXd0Jb0kzzxERzI2S4hc',
+      id: uuidGenerator(),
       name: 'Buenos Aires'
-    };
+    }
   }
 
   static getAll() {
     return [
       this.getBuenosAires()
-    ];
+    ]
   }
 }
 
-module.exports = MockHeadquarter;
+module.exports = MockHeadquarter
