@@ -1,6 +1,7 @@
 'use strict';
 
 const setupBaseController = require('../base.controller');
+
 const serviceContainer = require('../../../../services/service.container');
 
 let baseController = new setupBaseController();
@@ -9,9 +10,9 @@ const authenticationService = serviceContainer('authentication');
 
 const get = async (request, response) => {
   if (!request.params.id) {
-    return response
-      .status(400)
-      .json(baseController.getErrorResponse('Parameter is missing'));
+    return response.status(400).json(
+      baseController.getErrorResponse('Parameter is missing')
+    );
   }
 
   let responseCode;
@@ -19,7 +20,7 @@ const get = async (request, response) => {
   let requestedUserId = request.params.id;
 
   try {
-    let userData = await userService.findById(requestedUserId);
+    const userData = await userService.findById(requestedUserId);
 
     responseCode = userData.responseCode;
     responseData = baseController.getSuccessResponse(
@@ -32,19 +33,14 @@ const get = async (request, response) => {
     responseData = baseController.getErrorResponse('Error getting user information');
   }
 
-  return response
-    .status(responseCode)
-    .json(responseData);
+  return response.status(responseCode).json(responseData);
 };
 
 const getByUid = async (request, response) => {
   if (!request.body.uid) {
-    return response.status(400)
-      .json({
-        status: 'OK',
-        data: {},
-        message: 'Parameters are missing'
-      });
+    return response.status(400).json(
+      baseController.getErrorResponse('Parameters are missing')
+    );
   }
 
   const userData = await userService.findByUserId(request.body.uid);
@@ -61,7 +57,6 @@ const post = async (request, response) => {
   if (!request.body.name ||
     !request.body.lastName ||
     !request.body.email ||
-    !request.body.role ||
     !request.body.uid
   ) {
     return response.status(400).json(
@@ -69,24 +64,17 @@ const post = async (request, response) => {
     );
   }
 
-  const userData = {
-    email: request.body.email,
-    name: request.body.name,
-    lastName: request.body.lastName,
-    isAdmin: request.body.isAdmin,
-    role: request.body.role
-  };
-
   let responseCode = 500;
   let responseData;
 
   try {
-    const newUserData = await userService.create(userData, request.body.uid);
+    const newUserData = userService.getModel(request.body);
+    const newUseDataResponse = await userService.create(newUserData);
 
-    responseCode = newUserData.responseCode;
+    responseCode = newUseDataResponse.responseCode;
     responseData = baseController.getSuccessResponse(
-      newUserData.data,
-      newUserData.message
+      newUseDataResponse.data,
+      newUseDataResponse.message
     );
   } catch (err) {
     console.error('Error creating a new user: ', err);
@@ -154,9 +142,9 @@ const update = async (request, response) => {
 
 const remove = async (request, response) => {
   if (!request.params.id) {
-    return response
-      .status(400)
-      .json(baseController.getErrorResponse('Parameter is missing'));
+    return response.status(400).json(
+      baseController.getErrorResponse('Parameter is missing')
+    );
   }
 
   let responseCode;

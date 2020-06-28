@@ -15,21 +15,22 @@ const get = async (request, response) => {
   }
 
   const id = request.params.id;
+  let responseCode = 500
+  let responseData
 
   try {
     let eventResponse = await eventsService.findById(id);
-
-    return response
-      .status(eventResponse.responseCode)
-      .json(baseController.getSuccessResponse(eventResponse.data, eventResponse.message));
-  } catch (error) {
-    let errorMessage = `Error while getting event with id: ${id} `;
-    console.error(errorMessage);
-    return response
-      .status(500)
-      .json(baseController.getErrorResponse(errorMessage));
+    responseCode = eventResponse.responseCode
+    responseData = baseController.getSuccessResponse(eventResponse.data, eventResponse.message)
+  } catch (err) {
+    const errorMessage = `Error while getting event with id: ${id}`
+    /* eslint-disable no-console */
+    // console.error(errorMessage, err)
+    /* eslint-enable */
+    responseData = baseController.getErrorResponse(errorMessage)
   }
-};
+  return response.status(responseCode).json(responseData)
+}
 
 const post = async (request, response) => {
   let eventData = {};
@@ -179,7 +180,7 @@ const deleteImage = async (request, response) => {
   const id = request.params.id;
   const idImage = request.params.idImage;
   let responseData;
-  let responseCode;
+  let responseCode = 500
 
   try {
     const deleteResponse = await eventsService.deleteImage(id, idImage);
@@ -187,15 +188,15 @@ const deleteImage = async (request, response) => {
     responseCode = deleteResponse.responseCode;
     responseData = baseController.getSuccessResponse(deleteResponse.data, deleteResponse.message);
 
-  } catch (error) {
-    responseCode = 500;
-    console.error('Error while deleting image: ', error);
-    responseData = baseController.getErrorResponse('Error while deleting image');
+  } catch (err) {
+    const errorMessage = 'Error while deleting image'
+    /* eslint-disable no-console */
+    // console.error(errorMessage, err);
+    /* eslint-enable */
+    responseData = baseController.getErrorResponse(errorMessage);
   }
 
-  return response
-    .status(responseCode)
-    .json(responseData);
+  return response.status(responseCode).json(responseData);
 };
 
 const open = async (request, response) => {
@@ -322,31 +323,30 @@ const remove = async (request, response) => {
       .json(baseController.getErrorResponse('Wrong parameters'));
   }
 
-  const id = request.params.id;
+  const id = request.params.id
 
-  let responseCode;
-  let responseData;
+  let responseCode = 500
+  let responseData
 
   try {
-    const eventInfo = await eventsService.findById(id);
-    const eventResponse = await eventsService.remove(id);
+    const eventInfo = await eventsService.findById(id)
+    const eventResponse = await eventsService.remove(id)
     // Remove all images related to an event
     if (eventInfo.data.images && eventInfo.data.images.length > 0) {
-      await storageService.eraseList(eventInfo.data.images);
+      await storageService.eraseList(eventInfo.data.images)
     }
 
     responseCode = eventResponse.responseCode;
     responseData = baseController.getSuccessResponse(eventResponse.data, eventResponse.message);
   } catch (err) {
-    const errorMessage = `Error while removing event with id: ${id}`;
-    console.error(errorMessage, err);
-    responseCode = 500;
-    responseData = baseController.getErrorResponse('Error while removing event');
+    const errorMessage = `Error while removing event with id: ${id}`
+    /* eslint-disable no-console */
+    // console.error(errorMessage, err)
+    /* eslint-enable */
+    responseData = baseController.getErrorResponse(errorMessage)
   }
 
-  return response
-    .status(responseCode)
-    .json(responseData);
+  return response.status(responseCode).json(responseData)
 };
 
 module.exports = {

@@ -1,5 +1,7 @@
 'use strict';
 
+const UserAuthentication = require('./../models/user-authentication');
+
 const setupBaseService = require('./base.service');
 
 module.exports = (adminInstance) => {
@@ -55,12 +57,17 @@ module.exports = (adminInstance) => {
       response = baseService.getSuccessResponse({...authResponse}, successMessage);
 
     } catch (error) {
-      const errorMessage = 'Error creating user auth';
-      console.error(errorMessage, error);
+      const errorMessage = !error.errorInfo ?
+        'Error creating user auth' : error.errorInfo.message;
+      console.error('Error creating user auth', !error.errorInfo ? error : error.errorInfo);
       response = baseService.getErrorResponse(errorMessage);
     }
 
     return response;
+  };
+
+  const getModel = data => {
+    return new UserAuthentication(data);
   };
 
   const revokeToken = async (userId) => {
@@ -108,10 +115,13 @@ module.exports = (adminInstance) => {
     return baseService.returnData;
   };
 
+
+
   return {
     changeAvailability,
     changePasswordUsingAdminSDK,
     createUser,
+    getModel,
     revokeToken,
     verifyToken
   };

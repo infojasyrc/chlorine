@@ -1,62 +1,62 @@
 'use strict';
 
-const setupBaseService = require('./base.service');
+const BaseService = require('./base.service');
 
-module.exports = function setupHeadquartersService(dbInstance) {
+class HeadquarterService extends BaseService {
+  constructor(dbInstance) {
+    super()
+    this.collection = dbInstance.collection('headquarters')
+  }
 
-  const collection = dbInstance.collection('headquarters');
-
-  let baseService = new setupBaseService();
-
-  async function doList() {
-    let allData = [];
+  async doList() {
+    let allData = []
+    let response
 
     try {
-      let headquarterRef = await collection.get();
+      let headquarterRef = await this.collection.get();
 
       headquarterRef.forEach((doc) => {
-        let headquarter = {
+        allData.push({
           id: doc.id,
           ...doc.data()
-        };
-        allData.push(headquarter);
-      });
-      baseService.returnData.message = 'Getting all headquarters successfully';
+        })
+      })
+      const message = 'Getting all headquarters successfully';
+      response = this.getSuccessResponse(allData, message)
     } catch (err) {
-      baseService.returnData.message = 'Error getting all headquarters information';
-      console.log(baseService.returnData.message + ': ', err);
-      baseService.returnData.responseCode = 500;
-    } finally {
-      baseService.returnData.data = allData;
+      const errorMessage = 'Error getting all headquarters information'
+      /* eslint-disable no-console */
+      // console.error(errorMessage, err)
+      /* eslint-enable */
+      response = this.getErrorResponse(errorMessage)
     }
 
-    return baseService.returnData;
+    return response
   }
 
-  async function getHeadquarter(docId) {
-    let headquarterData = null;
+  async getHeadquarter(docId) {
+    let response
 
     try {
-      let headquarterRef = await collection
-        .doc(docId)
-        .get();
-
+      const headquarterRef = await this.collection.doc(docId).get()
+      let headquarterData = {}
       if (headquarterRef.exists) {
-        headquarterData = headquarterRef.data();
-        headquarterData.id = docId;
+        headquarterData = {...headquarterRef.data(), id: docId}
       }
 
-      baseService.returnData.message = 'Getting headquarter information successfully';
+      const message = 'Getting headquarter information successfully'
+      response = this.getSuccessResponse(headquarterData, message)
     } catch (err) {
-      baseService.returnData.message = 'Error getting headquarter information';
-      console.log(baseService.returnData.message + ': ', err);
-      baseService.returnData.responseCode = 500;
-    } finally {
-      baseService.returnData.data = headquarterData;
+      const errorMessage = 'Error getting headquarter information'
+      /* eslint-disable no-console */
+      // console.log(errorMessage, err)
+      /* eslint-enable */
+      response = this.getErrorResponse(errorMessage)
     }
 
-    return baseService.returnData;
+    return response
   }
 
-  return {doList, getHeadquarter};
-};
+}
+
+module.exports = HeadquarterService

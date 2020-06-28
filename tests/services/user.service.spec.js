@@ -1,9 +1,9 @@
-'use strict';
+'use strict'
 
-const test = require('ava');
-const sinon = require('sinon');
+const test = require('ava')
+const sinon = require('sinon')
 
-const setupUserService = require('../../services/user.service');
+const UserService = require('../../services/user.service')
 
 let sandbox = null;
 let userService;
@@ -96,7 +96,7 @@ test.beforeEach(() => {
       }
     });
 
-  userService = setupUserService(dbInstanceStub);
+  userService = new UserService(dbInstanceStub);
 });
 
 test.afterEach(() => {
@@ -112,26 +112,21 @@ test.serial('Create user: success response', async t => {
     email: 'test@email.com',
     isAdmin: true,
     isEnabled: true,
-    role: {
-      id: '1',
-      name: 'Marketing'
-    }
+    uid: 'ThisIsAUserUID'
   };
-  const userId = 'ThisIsAUserUID';
 
-  let newUser = await userService.create(userData, userId);
+  let newUser = await userService.create(userData);
 
   t.is(Object.prototype.hasOwnProperty.call(newUser, 'message'), true, 'Expected message key');
   t.is(Object.prototype.hasOwnProperty.call(newUser, 'data'), true, 'Expected data key');
 
-  t.is(newUser['data'].hasOwnProperty('userId'), true, 'Expected userId key');
+  t.is(newUser['data'].hasOwnProperty('uid'), true, 'Expected userId key');
   t.is(newUser['data'].hasOwnProperty('id'), true, 'Expected id key');
   t.is(newUser['data'].hasOwnProperty('email'), true, 'Expected email key');
   t.is(newUser['data'].hasOwnProperty('name'), true, 'Expected name key');
   t.is(newUser['data'].hasOwnProperty('lastName'), true, 'Expected lastName key');
   t.is(newUser['data'].hasOwnProperty('isAdmin'), true, 'Expected isAdmin key');
   t.is(newUser['data'].hasOwnProperty('isEnabled'), true, 'Expected isEnabled key');
-  t.is(newUser['data'].hasOwnProperty('role'), true, 'Expected role key');
 });
 
 test.serial('Do list all users', async t => {

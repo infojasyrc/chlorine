@@ -24,8 +24,7 @@
     "prefer-arrow-callback": 1,
     // Warn against nested then() or catch() statements
     "promise/no-nesting": 1,
-    "quotes": ["error", "single"],
-    "semi": ["error", "always"]
+    "quotes": ["error", "single"]
   },
   "overrides": [
     {

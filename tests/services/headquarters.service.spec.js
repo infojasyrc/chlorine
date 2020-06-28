@@ -1,15 +1,15 @@
-'use strict';
+'use strict'
 
-const test = require('ava');
-const sinon = require('sinon');
+const test = require('ava')
+const sinon = require('sinon')
 
-const setupHeadquartersService = require('../../services/headquarters.service');
+const HeadquartersService = require('../../services/headquarters.service')
 
-const collectionKey = 'headquarters';
-let sandbox = null;
-let dbInstanceStub = null;
+const collectionKey = 'headquarters'
+let sandbox = null
+let dbInstanceStub = null
 
-let headquartersService;
+let headquartersService
 
 test.beforeEach(() => {
   sandbox = sinon.createSandbox();
@@ -49,7 +49,7 @@ test.beforeEach(() => {
       }
     });
 
-  headquartersService = setupHeadquartersService(dbInstanceStub);
+  headquartersService = new HeadquartersService(dbInstanceStub);
 });
 
 test.afterEach(() => {

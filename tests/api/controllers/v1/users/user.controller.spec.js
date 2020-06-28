@@ -14,17 +14,22 @@ let sandbox = null;
 
 let userController;
 let baseController;
-const userService = {};
+let userService;
+const mockUserService = {};
 const authenticationService = {};
 
 test.beforeEach(() => {
   sandbox = sinon.createSandbox();
 
-  userService.findById = sandbox.stub();
-  userService.findByUserId = sandbox.stub();
-  userService.create = sandbox.stub();
-  userService.toggleEnable = sandbox.stub();
-  userService.update = sandbox.stub();
+  const mockDBInstance = {};
+  mockDBInstance.collection = sandbox.stub();
+
+  mockUserService.findById = sandbox.stub();
+  mockUserService.findByUserId = sandbox.stub();
+  mockUserService.create = sandbox.stub();
+  mockUserService.toggleEnable = sandbox.stub();
+  mockUserService.update = sandbox.stub();
+  mockUserService.getModel = sandbox.stub();
 
   authenticationService.changePasswordUsingAdminSDK = sandbox.stub();
   authenticationService.changeAvailability = sandbox.stub();
@@ -42,7 +47,7 @@ const getController = () => {
       switch(service) {
         case 'users':
         default: {
-          return userService;
+          return mockUserService;
         }
         case 'authentication': {
           return authenticationService;
@@ -84,7 +89,7 @@ test.serial('Get user: retrieve data', async t => {
     message: 'Getting user information successfully'
   };
 
-  userService.findById.withArgs(userId).returns(
+  mockUserService.findById.withArgs(userId).returns(
     Promise.resolve(userServiceResponse)
   );
 
@@ -149,7 +154,7 @@ test.serial('Create user: success response', async t => {
     message: 'Adding user successfully'
   };
 
-  userService.create.returns(
+  mockUserService.create.returns(
     Promise.resolve(userServiceResponse)
   );
 
@@ -214,8 +219,8 @@ test.serial('Update user: success response', async t => {
     data: {},
     message: 'Updating user successfully'
   };
-  
-  userService.update.returns(
+
+  mockUserService.update.returns(
     Promise.resolve(userServiceResponse)
   );
 
@@ -287,7 +292,7 @@ test.serial('Remove user: success response', async t => {
     message: 'User was disabled successfully'
   };
 
-  userService.toggleEnable.returns(
+  mockUserService.toggleEnable.returns(
     Promise.resolve(userServiceResponse)
   );
 
