@@ -10,9 +10,9 @@ const authenticationService = serviceContainer('authentication');
 
 const get = async (request, response) => {
   if (!request.params.id) {
-    return response
-      .status(400)
-      .json(baseController.getErrorResponse('Parameter is missing'));
+    return response.status(400).json(
+      baseController.getErrorResponse('Parameter is missing')
+    );
   }
 
   let responseCode;
@@ -20,7 +20,7 @@ const get = async (request, response) => {
   let requestedUserId = request.params.id;
 
   try {
-    let userData = await userService.findById(requestedUserId);
+    const userData = await userService.findById(requestedUserId);
 
     responseCode = userData.responseCode;
     responseData = baseController.getSuccessResponse(
@@ -33,19 +33,14 @@ const get = async (request, response) => {
     responseData = baseController.getErrorResponse('Error getting user information');
   }
 
-  return response
-    .status(responseCode)
-    .json(responseData);
+  return response.status(responseCode).json(responseData);
 };
 
 const getByUid = async (request, response) => {
   if (!request.body.uid) {
-    return response.status(400)
-      .json({
-        status: 'OK',
-        data: {},
-        message: 'Parameters are missing'
-      });
+    return response.status(400).json(
+      baseController.getErrorResponse('Parameters are missing')
+    );
   }
 
   const userData = await userService.findByUserId(request.body.uid);
@@ -147,9 +142,9 @@ const update = async (request, response) => {
 
 const remove = async (request, response) => {
   if (!request.params.id) {
-    return response
-      .status(400)
-      .json(baseController.getErrorResponse('Parameter is missing'));
+    return response.status(400).json(
+      baseController.getErrorResponse('Parameter is missing')
+    );
   }
 
   let responseCode;

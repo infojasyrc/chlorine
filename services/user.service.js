@@ -1,45 +1,47 @@
-'use strict';
+'use strict'
 
-const setupBaseService = require('./base.service');
-const User = require('./../models/user');
+const BaseService = require('./base.service')
+const User = require('./../models/user')
 
-module.exports = dbInstance => {
-
-  const collection = dbInstance.collection('users');
-
-  let baseService = new setupBaseService();
+class UserService extends BaseService {
+  constructor(dbInstance) {
+    super()
+    this.collection = dbInstance.collection('users')
+  }
 
   /**
    * Create user document
-   * @param {Object} userData 
+   * @param {Object} userData
    */
-  const create = async userData => {
-    let response;
+  async create(userData) {
+    let response
     const newUserData = {
       ...userData
-    };
-
-    try {
-      const newUserDoc = await collection.add(newUserData);
-      newUserData.id = newUserDoc.id;
-      const successMessage = 'User was successfully created';
-
-      response = baseService.getSuccessResponse(newUserData, successMessage);
-    } catch (error) {
-      const errorMessage = 'Error creating user document';
-      console.error(errorMessage, error);
-      response = baseService.getErrorResponse(errorMessage);
     }
 
-    return response;
-  };
+    try {
+      const newUserDoc = await this.collection.add(newUserData)
+      newUserData.id = newUserDoc.id
+      const successMessage = 'User was successfully created'
 
-  const doList = async () => {
+      response = this.getSuccessResponse(newUserData, successMessage)
+    } catch (error) {
+      const errorMessage = 'Error creating user document'
+      /* eslint-disable no-console */
+      // console.error(errorMessage, err)
+      /* eslint-enable */
+      response = this.getErrorResponse(errorMessage)
+    }
+
+    return response
+  }
+
+  async doList() {
     let allUsers = [];
     let response;
 
     try {
-      let userRefSnapshot = await collection.get();
+      let userRefSnapshot = await this.collection.get();
 
       userRefSnapshot.forEach((doc) => {
         let userData = doc.data();
@@ -48,132 +50,137 @@ module.exports = dbInstance => {
       });
 
       const successMessage = 'Getting all user list information successfully.';
-      response = baseService.getSuccessResponse(allUsers, successMessage);
+      response = this.getSuccessResponse(allUsers, successMessage);
     } catch (err) {
-      const errorMessage = 'Error getting user list information';
-      console.error(errorMessage, err);
-      response = baseService.getErrorResponse(errorMessage);
+      const errorMessage = 'Error getting user list information'
+      /* eslint-disable no-console */
+      // console.error(errorMessage, err)
+      /* eslint-enable */
+      response = this.getErrorResponse(errorMessage)
     }
 
     return response;
-  };
+  }
 
-  const findById = async id => {
-    let user = null;
-    let response;
+  async findById(id) {
+    let response
 
     try {
-      let userRefSnapshot = await collection.doc(id).get();
+      const userRefSnapshot = await this.collection.doc(id).get();
 
-      if (userRefSnapshot.exists) {
-        user = userRefSnapshot.data();
+      if (!userRefSnapshot.exists) {
+        return this.getSuccessResponse({}, 'No existing data');
       }
+      const user = {
+        ...userRefSnapshot.data(),
+        id: id
+      };
 
-      user.id = id;
       const successMessage = 'Getting user information successfully';
-      response = baseService.getSuccessResponse(user, successMessage);
+      response = this.getSuccessResponse(user, successMessage);
     } catch (err) {
       const errorMessage = 'Error getting user information';
-      console.error(errorMessage, err);
-      response = baseService.getErrorResponse(errorMessage);
+      /* eslint-disable no-console */
+      // console.error(errorMessage, err);
+      /* eslint-enable */
+      response = this.getErrorResponse(errorMessage);
     }
 
-    return response;
-  };
+    return response
+  }
 
-  const findByUserId = async userId => {
-    let user = null;
-    let response;
+  async findByUserId(userId) {
+    let user = null
+    let response
 
     try {
-      let userRefSnapshot = await collection
-        .where('userId', '==', userId)
+      let userRefSnapshot = await this.collection
+        .where('uid', '==', userId)
         .limit(1)
-        .get();
+        .get()
 
       if (userRefSnapshot.docs.length === 1) {
-        user = userRefSnapshot.docs[0].data();
-        user.id = userRefSnapshot.docs[0].id;
+        user = userRefSnapshot.docs[0].data()
+        user.id = userRefSnapshot.docs[0].id
       }
 
-      const successMessage = 'Getting user information successfully';
-      response = baseService.getSuccessResponse(user, successMessage);
+      const successMessage = 'Getting user information successfully'
+      response = this.getSuccessResponse(user, successMessage)
     } catch (err) {
-      const errorMessage = 'Error getting user information';
-      console.error(errorMessage, err);
-      response = baseService.getErrorResponse(errorMessage);
+      const errorMessage = 'Error getting user information'
+      /* eslint-disable no-console */
+      // console.error(errorMessage, err)
+      /* eslint-enable */
+      response = this.getErrorResponse(errorMessage)
     }
 
-    return response;
-  };
+    return response
+  }
 
   /**
    * Get user model
    * @param {Object} data
    */
-  const getModel = data => {
-    return new User(data);
-  };
+  getModel(data) {
+    return new User(data)
+  }
 
   /**
    * Disable user for removing operation
    * @param {String} id
    */
-  const toggleEnable = async id => {
-    let response;
+  async toggleEnable(id) {
+    let response
     try {
-      const userInfoRef = await collection.doc(id).get();
+      const userInfoRef = await this.collection.doc(id).get();
 
       const userData = userInfoRef.data();
       userData.isEnabled = !userData.isEnabled;
 
-      await collection.doc(id).update({
+      await this.collection.doc(id).update({
         isEnabled: userData.isEnabled
       });
 
       const successMessage = 'User was disabled successfully';
-      response = baseService.getSuccessResponse(userData, successMessage);
+      response = this.getSuccessResponse(userData, successMessage);
 
     } catch (err) {
       const errorMessage = 'Error removing a user';
-      console.error(errorMessage, err);
-      response = baseService.getErrorResponse(errorMessage);
+      /* eslint-disable no-console */
+      // console.error(errorMessage, err);
+      /* eslint-enable */
+      response = this.getErrorResponse(errorMessage);
     }
 
     return response;
-  };
+  }
 
-  const update = async (userId, userData) => {
-    let userResponse = null;
-    let response;
+  async update(userId, userData) {
+    let userResponse = null
+    let response
 
     try {
-      await collection.doc(userId).update(userData);
+      await this.collection.doc(userId).update(userData)
 
-      let userInfoRef = await collection.doc(userId).get();
+      let userInfoRef = await this.collection.doc(userId).get()
       userResponse = {
         ...userInfoRef.data(),
         id: userId
-      };
+      }
 
-      const successMessage = 'User was updated successfully';
-      response = baseService.getSuccessResponse(userResponse, successMessage);
+      const successMessage = 'User was updated successfully'
+      response = this.getSuccessResponse(userResponse, successMessage)
     } catch (err) {
-      const errorMessage = 'Error updating a user';
-      console.error('Error updating a user: ', err);
-      response = baseService.getErrorResponse(errorMessage);
+      const errorMessage = 'Error updating a user'
+      /* eslint-disable no-console */
+      // console.error(errorMessage, err)
+      /* eslint-enable */
+      response = this.getErrorResponse(errorMessage)
     }
 
-    return response;
-  };
+    return response
+  }
 
-  return {
-    create,
-    doList,
-    findById,
-    findByUserId,
-    getModel,
-    toggleEnable,
-    update
-  };
-};
+}
+
+module.exports = UserService

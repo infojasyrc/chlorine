@@ -1,9 +1,9 @@
-'use strict';
+'use strict'
 
-const test = require('ava');
-const sinon = require('sinon');
+const test = require('ava')
+const sinon = require('sinon')
 
-const setupUserService = require('../../services/user.service');
+const UserService = require('../../services/user.service')
 
 let sandbox = null;
 let userService;
@@ -96,7 +96,7 @@ test.beforeEach(() => {
       }
     });
 
-  userService = setupUserService(dbInstanceStub);
+  userService = new UserService(dbInstanceStub);
 });
 
 test.afterEach(() => {

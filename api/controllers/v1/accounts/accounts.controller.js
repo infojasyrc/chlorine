@@ -15,6 +15,8 @@ const checkBalance = async (request, response) => {
     return response.status(403).json(baseController.getErrorResponse('No session information'));
   }
 
+  responseCode = 500
+
   try {
     const sessionInfo = await sessionService.getUserSession(request.headers.authorization);
 
@@ -32,9 +34,11 @@ const checkBalance = async (request, response) => {
     }
 
   } catch (err) {
-    console.error('Error getting balance: ', err);
-    responseCode = 500;
-    responseData = baseController.getErrorResponse('Error getting balance information');
+    const errorMessage = 'Error getting balance information'
+    /* eslint-disable no-console */
+    // console.error(errorMessage, err)
+    /* eslint-enable */
+    responseData = baseController.getErrorResponse(errorMessage)
   }
 
   return response.status(responseCode).json(responseData);
@@ -44,6 +48,8 @@ const getAll = async (request, response) => {
   if (!baseController.isTokenInHeader(request)) {
     return response.status(400).json(baseController.getErrorResponse('No session information'));
   }
+
+  responseCode = 500
 
   try {
 
@@ -63,15 +69,17 @@ const getAll = async (request, response) => {
     }
 
   } catch (err) {
-    console.error('Error getting all accounts: ', err);
-    responseCode = 500;
-    responseData = baseController.getErrorResponse('Error getting accounts information');
+    const errorMessage = 'Error getting accounts information'
+    /* eslint-disable no-console */
+    // console.error(errorMessage, err)
+    /* eslint-enable */
+    responseData = baseController.getErrorResponse(errorMessage)
   }
 
-  return response.status(responseCode).json(responseData);
+  return response.status(responseCode).json(responseData)
 };
 
 module.exports = {
   checkBalance,
   getAll
-};
+}
