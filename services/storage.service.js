@@ -1,6 +1,6 @@
 'use strict';
 
-const uuidGenerator = require('uuid/v4');
+const {v4: uuidGenerator} = require('uuid');
 const setupBaseService = require('./base.service');
 
 module.exports = function setupStorageService(adminInstance) {
