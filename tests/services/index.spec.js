@@ -31,7 +31,7 @@ test.beforeEach(() => {
     './events.service': () => {},
     './authentication.service': () => {},
     './roles.service': () => {},
-    './headquarters.service': () => {},
+    './headquarters.service': sandbox.stub(),
     './storage.service': () => {},
     './accounts.service': () => {},
     './transactions.service': () => {}

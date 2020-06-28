@@ -7,7 +7,7 @@ const setupAttendeesService = require('./attendees.service');
 const setupEventsService = require('./events.service');
 const setupAuthenticationService = require('./authentication.service');
 const setupRolesService = require('./roles.service');
-const setupHeadquartersService = require('./headquarters.service');
+const HeadquartersService = require('./headquarters.service');
 const setupStorageService = require('./storage.service');
 const setupAccountsService = require('./accounts.service');
 const setupSessionService = require('./session.service');
@@ -22,7 +22,7 @@ module.exports = () => {
   const attendeesService = setupAttendeesService(serviceProviders.dbInstance);
   const eventsService = setupEventsService(serviceProviders.dbInstance);
   const rolesService = setupRolesService(serviceProviders.dbInstance);
-  const headquartersService = setupHeadquartersService(serviceProviders.dbInstance);
+  const headquartersService = new HeadquartersService(serviceProviders.dbInstance);
   const storageService = setupStorageService(serviceProviders.bucket);
   const accountsService = setupAccountsService(serviceProviders.dbInstance);
   const sessionService = setupSessionService(serviceProviders.adminAuth);

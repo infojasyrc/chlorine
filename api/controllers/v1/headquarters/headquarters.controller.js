@@ -7,8 +7,8 @@ let baseController = new setupBaseController()
 const headquartersService = serviceContainer('headquarters')
 
 const get = async (request, response) => {
-  let responseCode;
-  let responseData;
+  let responseCode = 500
+  let responseData
 
   try {
     const allData = await headquartersService.doList();
@@ -16,17 +16,17 @@ const get = async (request, response) => {
     responseData = baseController.getSuccessResponse(
       allData.data,
       allData.message
-    );
+    )
   } catch (err) {
-    console.error('Error getting all headquarters: ', err);
-    responseCode = 500;
-    responseData = baseController.getErrorResponse('Error getting all headquarters');
+    const errorMessage = 'Error getting all headquarters'
+    /* eslint-disable no-console */
+    // console.error(errorMessage, err)
+    /* eslint-enable */
+    responseData = baseController.getErrorResponse(errorMessage)
   }
 
-  return response
-    .status(responseCode)
-    .json(responseData);
-};
+  return response.status(responseCode).json(responseData);
+}
 
 module.exports = {
   get
