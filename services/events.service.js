@@ -97,24 +97,18 @@ class EventsService extends BaseService {
   }
 
   async getEventData(id) {
-    let event = {};
-    try {
-      const dataSnapshot = await this.collection.doc(id).get();
+    const dataSnapshot = await this.collection.doc(id).get()
 
-      if (dataSnapshot.exists) {
-        event = dataSnapshot.data();
+    if (!dataSnapshot.exists) {
+      throw new Error(`Event ${id} not found`)
+    }
+    const event = dataSnapshot.data()
 
-        if (!event.eventType) {
-          event.eventType = this.recrutingEventType;
-        }
-      }
-    } catch (err) {
-      /* eslint-disable no-console */
-      console.error('Error getting event information: ', err)
-      /* eslint-enable */
+    if (!event.eventType) {
+      event.eventType = this.recrutingEventType
     }
 
-    return event;
+    return event
   }
 
   async findById(id) {
@@ -129,7 +123,7 @@ class EventsService extends BaseService {
       const successMessage = 'Getting event information successfully'
       response = this.getSuccessResponse(event, successMessage)
     } catch (err) {
-      const errorMessage = 'Error getting event information'
+      const errorMessage = `Error getting event ${id} information`
       /* eslint-disable no-console */
       // console.error(errorMessage, err);
       /* eslint-enable */
