@@ -5,7 +5,7 @@ const sinon = require('sinon');
 
 const mockFirestoreCollectionList = require('./../util/firestore.collection.list');
 
-const setupEventsService = require('../../services/events.service');
+const EventsService = require('../../services/events.service');
 
 let collectionKey = 'events';
 let sandbox = null;
@@ -59,7 +59,7 @@ test.beforeEach(() => {
       }
     });
 
-  eventsService = setupEventsService(dbInstanceStub);
+  eventsService = new EventsService(dbInstanceStub);
 });
 
 test.afterEach(() => {
@@ -97,12 +97,12 @@ test.serial('Create event', async t => {
   t.is(newEvent['data'].hasOwnProperty('responsable'), true, 'Expected responsable key');
 });
 
-test.serial('Do list all events without year and headquarter', async t => {
-  let eventsData = await eventsService.doList({});
+test.serial('Do list all events without year', async t => {
+  const error = await t.throwsAsync(() => (
+    eventsService.doList({})
+  ), {instanceOf: Error})
 
-  t.is(eventsData.hasOwnProperty('message'), true, 'Expected message key');
-  t.is(eventsData.hasOwnProperty('data'), true, 'Expected data key');
-  t.is(eventsData['data'].length, 0, 'Expected 0 elements');
+  t.is(error.message, 'Missing parameter')
 });
 
 test.skip('Do list all events with year and headquarter', async t => {

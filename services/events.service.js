@@ -1,62 +1,66 @@
 'use strict';
 
-const setupBaseService = require('./base.service');
+const BaseService = require('./base.service');
 
-module.exports = function setupEventsService(dbInstance) {
+class EventsService extends BaseService {
 
-  const collection = dbInstance.collection('events');
-  let baseService = new setupBaseService();
-
-  const recrutingEventType = 'recruiting';
-  const salesEventType = 'sales';
-
-  async function create(data) {
-    let newEvent = null;
-
-    try {
-      data.status = 'created';
-      newEvent = data;
-      newEvent.year = new Date(data.date).getFullYear();
-      let newEventRef = await collection.add(data);
-      newEvent.id = newEventRef.id;
-      baseService.returnData.message = 'Event was successfully created.';
-    } catch (err) {
-      console.error('Error creating an event: ', err);
-      baseService.returnData.responseCode = 500;
-      baseService.returnData.message = 'Error adding a event';
-    } finally {
-      baseService.returnData.data = newEvent;
-    }
-
-    return baseService.returnData;
+  constructor(dbInstance) {
+    super()
+    this.collection = dbInstance.collection('events')
+    this.recrutingEventType = 'recruiting'
+    this.salesEventType = 'sales'
+    this.eventCreatedStatus = 'created'
   }
 
-  async function doList(eventParams) {
-    let allEvents = [];
+  async create(data) {
+    let newEvent = null
+    let response
+
+    try {
+      data.status = this.eventCreatedStatus
+      newEvent = data
+      newEvent.year = new Date(data.date).getFullYear()
+      let newEventRef = await this.collection.add(data)
+      newEvent.id = newEventRef.id
+      // TODO: Create a constants object and replace this message
+      const successMessage = 'Event was successfully created.'
+      response = this.getSuccessResponse(newEvent, successMessage)
+    } catch (err) {
+      const errorMessage = 'Error adding a event'
+      /* eslint-disable no-console */
+      // console.error('Error creating an event: ', err)
+      /* eslint-enable */
+      response = this.getErrorResponse(errorMessage);
+    }
+
+    return response;
+  }
+
+  async doList(eventParams) {
+    let allEvents = []
+    let response
 
     const {
       year,
       withAttendees,
       headquarterId,
       showAllStatus
-    } = eventParams;
+    } = eventParams
 
     if (!year) {
-      baseService.returnData.message = 'No year provided';
-      baseService.returnData.responseCode = 400;
-      baseService.returnData.data = allEvents;
-      return baseService.returnData;
+      // TODO: Create a constants object and replace this message
+      throw new Error('Missing parameter')
     }
 
     try {
 
-      let rootQuery = collection.where('year', '==', parseInt(year, 10));
+      let rootQuery = this.collection.where('year', '==', parseInt(year, 10))
 
       if (headquarterId) {
-        rootQuery = rootQuery.where('headquarter.id', '==', headquarterId);
+        rootQuery = rootQuery.where('headquarter.id', '==', headquarterId)
       }
 
-      const dataSnapshot = await rootQuery.get();
+      const dataSnapshot = await rootQuery.get()
 
       dataSnapshot.forEach((doc) => {
         const event = {
@@ -77,57 +81,65 @@ module.exports = function setupEventsService(dbInstance) {
         }
       });
 
-      baseService.returnData.message = 'Getting all events successfully';
+      // TODO: Create a constants object and replace this message
+      const successMessage = 'Getting all events successfully'
+      response = this.getSuccessResponse(allEvents, successMessage)
+
     } catch (err) {
-      console.error('Error getting documents: ', err);
-      baseService.returnData.message = 'Error getting all events';
-      baseService.returnData.responseCode = 500;
-    } finally {
-      baseService.returnData.data = allEvents;
+      const errorMessage = 'Error getting all events'
+      /* eslint-disable no-console */
+      // console.error(errorMessage, err)
+      /* eslint-enable */
+      response = this.getErrorResponse(errorMessage)
     }
 
-    return baseService.returnData;
+    return response;
   }
 
-  async function getEventData(id) {
+  async getEventData(id) {
     let event = {};
     try {
-      const dataSnapshot = await collection.doc(id).get();
+      const dataSnapshot = await this.collection.doc(id).get();
 
       if (dataSnapshot.exists) {
         event = dataSnapshot.data();
 
         if (!event.eventType) {
-          event.eventType = recrutingEventType;
+          event.eventType = this.recrutingEventType;
         }
       }
     } catch (err) {
-      console.error('Error getting event information: ', err);
-      event = {};
+      /* eslint-disable no-console */
+      console.error('Error getting event information: ', err)
+      /* eslint-enable */
     }
 
     return event;
   }
 
-  async function findById(id) {
-    let event = null;
+  async findById(id) {
+    let event = null
+    let response
 
     try {
-      event = await getEventData(id);
-      event.id = id;
-      baseService.returnData.message = 'Getting event information successfully';
+      event = await this.getEventData(id)
+      event.id = id
+
+      // TODO: Create a constants object and replace this message
+      const successMessage = 'Getting event information successfully'
+      response = this.getSuccessResponse(event, successMessage)
     } catch (err) {
-      console.error('Error getting event information: ', err);
-      baseService.returnData.message = 'Error getting event information';
-      baseService.returnData.responseCode = 500;
-    } finally {
-      baseService.returnData.data = event;
+      const errorMessage = 'Error getting event information'
+      /* eslint-disable no-console */
+      // console.error(errorMessage, err);
+      /* eslint-enable */
+      response = this.getErrorResponse(errorMessage)
     }
 
-    return baseService.returnData;
+    return response
   }
 
-  function filteredEventImages(event, deletedImages) {
+  filteredEventImages(event, deletedImages) {
     if (!event.images || (event.images && event.images.length === 0)) {
       return [];
     }
@@ -153,206 +165,183 @@ module.exports = function setupEventsService(dbInstance) {
     return filteredImages;
   }
 
-  async function update(id, data) {
-    let eventData = null;
-    let deletedImages = [];
+  async update(id, data) {
+    let eventData = null
+    let deletedImages = []
+    let response
 
-    data.year = new Date(data.date).getFullYear();
+    data.year = new Date(data.date).getFullYear()
 
     if (data.deletedImages) {
-      deletedImages = data.deletedImages;
-      delete data.deletedImages;
+      deletedImages = data.deletedImages
+      delete data.deletedImages
     }
 
     try {
 
       if (deletedImages.length > 0) {
-        const existingEventData = await getEventData(id);
+        const existingEventData = await this.getEventData(id)
         // TODO: Implement here a call for removing image in firebase storage
-        data.images = filteredEventImages(existingEventData, deletedImages);
+        data.images = this.filteredEventImages(existingEventData, deletedImages)
       }
 
-      await collection.doc(id).update(data);
+      await this.collection.doc(id).update(data)
 
-      let eventRef = await collection.doc(id).get();
+      let eventRef = await this.collection.doc(id).get()
 
       eventData = {
         id: id,
         ...eventRef.data()
-      };
+      }
 
-      baseService.returnData.message = 'Event was updated successfully';
+      const successMessage = 'Event was updated successfully'
+      response = this.getSuccessResponse(eventData, successMessage)
     } catch (err) {
-      console.error('Error updating event information: ', err);
-      baseService.returnData.message = 'Error updating event information';
-      baseService.returnData.responseCode = 500;
-    } finally {
-      baseService.returnData.data = eventData;
+      const errorMessage = 'Error updating event information'
+      /* eslint-disable no-console */
+      // console.error(errorMessage, err)
+      /* eslint-enable */
+      response = this.getErrorResponse(errorMessage)
     }
 
-    return baseService.returnData;
+    return response
   }
 
-  async function updateImages(id, images) {
-    let event = null;
+  async updateImages(id, images) {
+    let event = null
+    let response
 
     try {
-      let dataSnapshot = await collection.doc(id).get();
+      const dataSnapshot = await this.collection.doc(id).get()
 
       event = dataSnapshot.exists ?
-        dataSnapshot.data() :
-        null;
-      event.id = id;
+        dataSnapshot.data() : null
+      event.id = id
 
       if (!event.images) {
-        event.images = [];
+        event.images = []
       }
 
       for (let index = 0; index < images.length; index++) {
-        const image = images[index];
-
-        event.images
-          .push({
-            id: image.id,
-            url: image.url
-          });
+        event.images.push({
+          id: images[index].id,
+          url: images[index].url
+        })
       }
 
-      await collection
-        .doc(id)
-        .update(event);
+      await this.collection.doc(id).update(event)
 
-      baseService.returnData.message = 'Updated images successfully';
+      // TODO: Create a constants object and replace this message
+      const successMessage = 'Updated images successfully'
+      response = this.getSuccessResponse(event, successMessage)
     } catch (err) {
-      console.error('Error updating event images information: ', err);
-      baseService.returnData.message = 'Error updating event images information';
-      baseService.returnData.responseCode = 500;
-    } finally {
-      baseService.returnData.data = event;
+      // TODO: Create a constants object and replace this message
+      const errorMessage = 'Error updating event images information'
+      /* eslint-disable no-console */
+      console.error(errorMessage, err)
+      /* eslint-enable */
+      response = this.getErrorResponse(errorMessage)
     }
 
-    return baseService.returnData;
+    return response
   }
 
-  async function deleteImage(id, idImage) {
-    let event = null;
+  async deleteImage(id, idImage) {
+    let event = null
+    let response
 
     try {
-      let dataSnapshot = await collection
-        .doc(id)
-        .get();
+      const dataSnapshot = await this.collection.doc(id).get();
 
-      event = dataSnapshot.exists ?
-        dataSnapshot.data() :
-        null;
+      event = dataSnapshot.exists ? dataSnapshot.data() : null;
 
       if (!event) {
-        return {
-          data: {},
-          message: `The event id ${id} was not found`
-        };
+        throw new Error({message: `The event id ${id} was not found`})
       }
 
       event.id = id;
 
-      const imageIndex = event
-        .images
-        .findIndex(image => {
-          return image.id === idImage;
-        });
+      const imageIndex = event.images.findIndex(image => {
+        return image.id === idImage;
+      })
 
       if (imageIndex < 0) {
-        return {
-          data: {},
-          message: `The image id ${id} was not found`
-        };
+        throw new Error({message: `The image id ${id} was not found`})
       }
 
-      event
-        .images
-        .splice(imageIndex, 1);
+      event.images.splice(imageIndex, 1)
 
-      await collection
-        .doc(id)
-        .update(event);
+      await this.collection.doc(id).update(event)
 
-      baseService.returnData.message = 'Updated images successfully';
+      // TODO: Create a constants object and replace this message
+      const successMessage = 'Updated images successfully'
+      response = this.getSuccessResponse(event, successMessage)
     } catch (err) {
-      console.error('Error updating event images information: ', err);
-      baseService.returnData.message = 'Error updating event images information';
-      baseService.returnData.responseCode = 500;
-    } finally {
-      baseService.returnData.data = event;
+      // TODO: Create a constants object and replace this message
+      const errorMessage = 'Error updating event images information'
+      /* eslint-disable no-console */
+      // console.error(errorMessage, err)
+      /* eslint-enable */
+      response = this.getErrorResponse(errorMessage)
     }
 
-    return baseService.returnData;
+    return response
   }
 
-  async function open(id) {
-    return await setStatus(id, 'opened');
+  async open(id) {
+    return await this.setStatus(id, 'opened');
   }
 
-  async function pause(id) {
-    return await setStatus(id, 'paused');
+  async pause(id) {
+    return await this.setStatus(id, 'paused')
   }
 
-  async function close(id) {
-    return await setStatus(id, 'closed');
+  async close(id) {
+    return await this.setStatus(id, 'closed')
   }
 
-  async function setStatus(id, status) {
-    let event = null;
+  async setStatus(id, status) {
+    let response
 
     try {
-      let dataSnapshot = await collection
-        .doc(id)
-        .get();
+      const dataSnapshot = await this.collection.doc(id).get()
 
-      event = dataSnapshot.exists ?
-        dataSnapshot.data() :
-        null;
+      const event = dataSnapshot.exists ? dataSnapshot.data() : null
 
       if (!event) {
-        return {
-          data: {},
-          message: `The event id ${id} was not found`
-        };
+        throw new Error({message: `The event id ${id} was not found`})
       }
 
-      event.id = id;
-      event.status = status;
+      event.id = id
+      event.status = status
 
-      await collection
-        .doc(id)
-        .update(event);
+      await this.collection.doc(id).update(event)
 
-      baseService.returnData.message = 'Event status changed succesfully';
-    } catch (error) {
-      console.error('Error while changing event\'s status: ', error);
-      baseService.returnData.message = 'Error while changing event\'s status';
-      baseService.returnData.responseCode = 500;
-    } finally {
-      baseService.returnData.data = event;
+      // TODO: Create a constants object and replace this message
+      const successMessage = 'Event status changed succesfully'
+      response = this.getSuccessResponse(event, successMessage)
+    } catch (err) {
+      // TODO: Create a constants object and replace this message
+      const errorMessage = 'Error while changing event\'s status'
+      /* eslint-disable no-console */
+      // console.error(errorMessage, err);
+      /* eslint-enable */
+      response = this.getErrorResponse(errorMessage)
     }
 
-    return baseService.returnData;
+    return response
   }
 
-  async function addAttendees(id, attendees) {
-    let event = null;
+  async addAttendees(id, attendees) {
+    let response
 
     try {
-      let dataSnapshot = await collection.doc(id).get();
+      let dataSnapshot = await this.collection.doc(id).get();
 
-      const event = dataSnapshot.exists ?
-        dataSnapshot.data() :
-        null;
+      const event = dataSnapshot.exists ? dataSnapshot.data() : null
 
       if (!event) {
-        baseService.returnData.responseCode = 400;
-        baseService.returnData.data = {};
-        baseService.returnData.message = `The event id ${id} was not found`;
-        return baseService.returnData;
+        throw new Error({message: `The event id ${id} was not found`})
       }
 
       if (!event.attendees) {
@@ -360,61 +349,50 @@ module.exports = function setupEventsService(dbInstance) {
       }
 
       attendees.map(attendee => {
-        const addedIndex = event
-          .attendees
-          .findIndex(addedAttendee => {
-            return addedAttendee.id === attendee.id;
-          });
+        const addedIndex = event.attendees.findIndex(addedAttendee => {
+          return addedAttendee.id === attendee.id
+        })
 
         if (addedIndex < 0) {
-          event
-            .attendees
-            .push(attendee);
+          event.attendees.push(attendee)
         }
-      });
+      })
 
-      event.id = id;
+      event.id = id
 
-      await collection.doc(id).update(event);
+      await this.collection.doc(id).update(event)
 
-      baseService.returnData.message = 'Attendees added succesfully';
-    } catch (error) {
-      console.error('Error while adding attendees to event: ', error);
-      baseService.returnData.responseCode = 500;
-      baseService.returnData.message = 'Error while adding attendees to event';
-    } finally {
-      baseService.returnData.data = event;
+      // TODO: Create a constants object and replace this message
+      const successMessage = 'Attendees added succesfully'
+      response = this.getSuccessResponse(event, successMessage)
+    } catch (err) {
+      const errorMessage = 'Error while adding attendees to event'
+      /* eslint-disable no-console */
+      // console.error(errorMessage, err)
+      /* eslint-enable */
+      response = this.getErrorResponse(errorMessage)
     }
 
-    return baseService.returnData;
+    return response
   }
 
-  async function remove(id) {
-
+  async remove(id) {
+    let response
     try {
-      await collection.doc(id).delete();
-      baseService.returnData.message = 'Event successfully deleted';
+      await this.collection.doc(id).delete()
+      const successMessage = 'Event successfully deleted'
+      response = this.getSuccessResponse({}, successMessage)
     } catch (err) {
       const errorMessage = 'Error removing event';
-      console.error(errorMessage + ': ', err);
-      baseService.returnData.responseCode = 500;
-      baseService.returnData.message = errorMessage;
+      /* eslint-disable no-console */
+      // console.error(errorMessage, err);
+      /* eslint-enable */
+      response = this.getErrorResponse(errorMessage)
     }
 
-    return baseService.returnData;
+    return response;
   }
 
-  return {
-    create,
-    doList,
-    findById,
-    update,
-    updateImages,
-    deleteImage,
-    open,
-    pause,
-    close,
-    addAttendees,
-    remove
-  };
-};
+}
+
+module.exports = EventsService
