@@ -1,0 +1,12 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "eamodio.gitlens",
+    "esbenp.prettier-vscode",
+    "github.github-vscode-theme",
+    "github.vscode-pull-request-github",
+    "ms-vsliveshare.vsliveshare-pack",
+    "nodesource.vscode-for-node-js-development-pack",
+    "samverschueren.ava"
+  ]
+}

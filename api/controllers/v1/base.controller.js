@@ -1,33 +1,33 @@
-'use strict';
+'use strict'
 
 class baseController {
   constructor() {
-    this.successStatus =  'OK';
-    this.errorStatus = 'ERROR';
+    this.successStatus = 'OK'
+    this.errorStatus = 'ERROR'
     this.responseData = {
       status: '',
       data: {},
-      message: ''
-    };
+      message: '',
+    }
   }
 
   getSuccessResponse(data, message) {
-    this.responseData.status = this.successStatus;
-    this.responseData.data = data;
-    this.responseData.message = message;
-    return this.responseData;
+    this.responseData.status = this.successStatus
+    this.responseData.data = data
+    this.responseData.message = message
+    return this.responseData
   }
 
   getErrorResponse(message) {
-    this.responseData.status = this.errorStatus;
-    this.responseData.data = {};
-    this.responseData.message = message;
-    return this.responseData;
+    this.responseData.status = this.errorStatus
+    this.responseData.data = {}
+    this.responseData.message = message
+    return this.responseData
   }
 
   isTokenInHeader(request) {
-    return request.headers.authorization;
+    return request.headers.authorization
   }
 }
 
-module.exports = baseController;
+module.exports = baseController
