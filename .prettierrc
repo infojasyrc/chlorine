@@ -3,6 +3,8 @@
   "tabWidth": 2,
   "semi": false,
   "singleQuote": true,
-  "printWidth": 80,
-  "arrowParens": "avoid"
+  "printWidth": 100,
+  "arrowParens": "avoid",
+  "quoteProps": "as-needed",
+  "proseWrap": "preserve"
 }

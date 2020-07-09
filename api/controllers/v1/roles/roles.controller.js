@@ -1,35 +1,29 @@
-'use strict';
+'use strict'
 
-const setupBaseController = require('../base.controller');
-const serviceContainer = require('../../../../services/service.container');
+const BaseController = require('../base.controller')
+const serviceContainer = require('../../../../services/service.container')
 
-let baseController = new setupBaseController();
-const rolesService = serviceContainer('roles');
+let baseController = new BaseController()
+const rolesService = serviceContainer('roles')
 
 const get = async (request, response) => {
-
-  let responseCode;
-  let responseData;
+  let responseCode
+  let responseData
 
   try {
-    const rolesData = await rolesService.doList();
+    const rolesData = await rolesService.doList()
 
-    responseCode = rolesData.responseCode;
-    responseData = baseController.getSuccessResponse(
-      rolesData.data,
-      rolesData.message
-    );
+    responseCode = rolesData.responseCode
+    responseData = baseController.getSuccessResponse(rolesData.data, rolesData.message)
   } catch (err) {
-    console.error('Error getting all roles: ', err);
-    responseCode = 500;
-    responseData = baseController.getErrorResponse('Error getting all roles');
+    console.error('Error getting all roles: ', err)
+    responseCode = 500
+    responseData = baseController.getErrorResponse('Error getting all roles')
   }
 
-  return response
-    .status(responseCode)
-    .json(responseData);
-};
+  return response.status(responseCode).json(responseData)
+}
 
 module.exports = {
-  get
-};
+  get,
+}

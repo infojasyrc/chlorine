@@ -1,46 +1,49 @@
-'use strict';
+'use strict'
 
-const setupBaseController = require('../base.controller');
-const serviceContainer = require('../../../../services/service.container');
+const BaseController = require('../base.controller')
+const serviceContainer = require('../../../../services/service.container')
 
-let baseController = new setupBaseController();
-const authenticationService = serviceContainer('authentication');
+let baseController = new BaseController()
+const authenticationService = serviceContainer('authentication')
 
-let responseCode;
-let responseData;
+let responseCode
+let responseData
 
 const revokeToken = async (request, response) => {
   if (!baseController.isTokenInHeader(request)) {
-    return response.status(400).json(baseController.getErrorResponse('No session information'));
+    return response.status(400).json(baseController.getErrorResponse('No session information'))
   }
 
   responseCode = 500
   try {
-    const sessionService = serviceContainer('session');
-    const sessionInfo = await sessionService.getUserSession(request.headers.authorization);
+    const sessionService = serviceContainer('session')
+    const sessionInfo = await sessionService.getUserSession(request.headers.authorization)
 
     if (!sessionInfo.data) {
-      return response.status(sessionInfo.responseCode).json({message: sessionInfo.message});
+      return response.status(sessionInfo.responseCode).json({ message: sessionInfo.message })
     }
 
-    let loginData = await authenticationService.revokeToken(sessionInfo.data);
+    let loginData = await authenticationService.revokeToken(sessionInfo.data)
 
-    responseCode = loginData.responseCode;
-    responseData = baseController.getSuccessResponse({timeStamp: loginData.data}, loginData.message);
+    responseCode = loginData.responseCode
+    responseData = baseController.getSuccessResponse(
+      { timeStamp: loginData.data },
+      loginData.message
+    )
   } catch (err) {
-    const errorMessage = 'Error revoking token';
+    const errorMessage = 'Error revoking token'
     /* eslint-disable no-console */
     // console.error(errorMessage, err);
     /* eslint-enable */
-    responseData = baseController.getErrorResponse(errorMessage);
+    responseData = baseController.getErrorResponse(errorMessage)
   }
 
-  return response.status(responseCode).json(responseData);
-};
+  return response.status(responseCode).json(responseData)
+}
 
 const resetPassword = async (request, response) => {
   if (!request.body.email) {
-    return response.status(400).json(baseController.getErrorResponse('Email parameter is missing'));
+    return response.status(400).json(baseController.getErrorResponse('Email parameter is missing'))
   }
 
   responseCode = 500
@@ -61,17 +64,16 @@ const resetPassword = async (request, response) => {
   }
 
   return response.status(responseCode).json(responseData)
-};
+}
 
 const create = async (request, response) => {
-  if (!request.body.email ||
+  if (
+    !request.body.email ||
     !request.body.password ||
     !request.body.name ||
     !request.body.lastName
   ) {
-    return response.status(400).json(
-      baseController.getErrorResponse('Parameters are missing')
-    );
+    return response.status(400).json(baseController.getErrorResponse('Parameters are missing'))
   }
 
   responseCode = 500
@@ -99,5 +101,5 @@ const create = async (request, response) => {
 module.exports = {
   create,
   revokeToken,
-  resetPassword
+  resetPassword,
 }

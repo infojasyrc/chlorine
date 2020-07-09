@@ -1,16 +1,14 @@
 'use strict'
 
-const setupBaseController = require('../base.controller')
+const BaseController = require('../base.controller')
 const serviceContainer = require('../../../../services/service.container')
 
-let baseController = new setupBaseController()
+let baseController = new BaseController()
 const headquartersService = serviceContainer('headquarters')
 
 const get = async (request, response) => {
   if (!request.params.id) {
-    return response.status(400).json(
-      baseController.getErrorResponse('Parameter is missing')
-    )
+    return response.status(400).json(baseController.getErrorResponse('Parameter is missing'))
   }
 
   let responseCode = 500
@@ -19,6 +17,7 @@ const get = async (request, response) => {
   try {
     const headquarterData = await headquartersService.getHeadquarter(request.params.id)
     responseCode = headquarterData.responseCode
+    // prettier-ignore
     responseData = baseController.getSuccessResponse(
       headquarterData.data,
       headquarterData.message
@@ -35,5 +34,5 @@ const get = async (request, response) => {
 }
 
 module.exports = {
-  get
+  get,
 }

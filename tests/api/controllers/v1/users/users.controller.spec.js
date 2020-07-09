@@ -1,72 +1,69 @@
-'use strict';
+'use strict'
 
-const test = require('ava');
-const sinon = require('sinon');
-const proxyquire = require('proxyquire');
-const {
-  mockRequest,
-  mockResponse
-} = require('mock-req-res');
+const test = require('ava')
+const sinon = require('sinon')
+const proxyquire = require('proxyquire')
+const { mockRequest, mockResponse } = require('mock-req-res')
 
-const setupBaseController = require('./../../../../../api/controllers/v1/base.controller');
+const BaseController = require('./../../../../../api/controllers/v1/base.controller')
 
-let sandbox = null;
+let sandbox = null
 
-let usersController;
-const userService = {};
-let baseController;
+let usersController
+const userService = {}
+let baseController
 
 test.beforeEach(() => {
-  sandbox = sinon.createSandbox();
+  sandbox = sinon.createSandbox()
 
-  userService.doList = sandbox.stub();
-  baseController = new setupBaseController();
-});
+  userService.doList = sandbox.stub()
+  baseController = new BaseController()
+})
 
 test.afterEach(() => {
-  sandbox && sandbox.restore();
-});
+  sandbox && sandbox.restore()
+})
 
 const getController = () => {
   return proxyquire('./../../../../../api/controllers/v1/users/users.controller', {
     './../../../../services/service.container': () => {
       return {
-        doList: userService.doList
-      };
-    }
-  });
+        doList: userService.doList,
+      }
+    },
+  })
 }
 
 test.serial('Get all users', async t => {
   const req = mockRequest({
-    params: {}
-  });
-  const res = mockResponse();
+    params: {},
+  })
+  const res = mockResponse()
 
   const userServiceResponse = {
     responseCode: 200,
     data: [],
-    message: ''
-  };
-  
-  userService.doList.returns(Promise.resolve(userServiceResponse));
+    message: '',
+  }
 
-  usersController = getController();
+  userService.doList.returns(Promise.resolve(userServiceResponse))
 
-  await usersController.get(req, res);
+  usersController = getController()
 
-  t.true(res.status.called, 'Expected response status was executed');
+  await usersController.get(req, res)
+
+  t.true(res.status.called, 'Expected response status was executed')
   t.true(
     res.status.calledWith(userServiceResponse.responseCode),
     'Expected response status with success response'
-  );
-  t.true(res.json.called, 'Expected response json was executed');
+  )
+  t.true(res.json.called, 'Expected response json was executed')
   t.true(
     res.json.calledWith({
       status: baseController.successStatus,
       data: userServiceResponse.data,
-      message: userServiceResponse.message
+      message: userServiceResponse.message,
     }),
     'Expected response json was executed'
-  );
-});
+  )
+})

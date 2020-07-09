@@ -1,6 +1,6 @@
 'use strict'
 
-class baseController {
+class BaseController {
   constructor() {
     this.successStatus = 'OK'
     this.errorStatus = 'ERROR'
@@ -30,4 +30,4 @@ class baseController {
   }
 }
 
-module.exports = baseController
+module.exports = BaseController
