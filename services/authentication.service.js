@@ -2,33 +2,35 @@
 
 const UserAuthentication = require('./../models/user-authentication')
 
-const setupBaseService = require('./base.service')
+const BaseService = require('./base.service')
 
-module.exports = adminInstance => {
-  const adminAuth = adminInstance
-  const baseService = new setupBaseService()
+class AuthenticationService extends BaseService {
+  constructor(adminInstance) {
+    super()
+    this.adminAuth = adminInstance
+  }
 
-  const updateUser = async (userId, userData) => {
+  async updateUser(userId, userData) {
     let response
 
     try {
-      const updateResponse = await adminAuth.updateUser(userId, userData)
+      const updateResponse = await this.adminAuth.updateUser(userId, userData)
 
       const successMessage = 'User information updated successfully'
-      response = baseService.getSuccessResponse(updateResponse, successMessage)
+      response = this.getSuccessResponse(updateResponse, successMessage)
     } catch (err) {
       const errorMessage = 'Error updating user'
       /* eslint-disable no-console */
       // console.error(errorMessage, err);
       /* eslint-enable */
-      response = baseService.getErrorResponse(errorMessage)
+      response = this.getErrorResponse(errorMessage)
     }
 
     return response
   }
 
-  const changePasswordUsingAdminSDK = async (userId, newPassword) => {
-    return await updateUser(userId, {
+  async changePassword(userId, newPassword) {
+    return await this.updateUser(userId, {
       password: newPassword,
     })
   }
@@ -38,8 +40,8 @@ module.exports = adminInstance => {
    * @param {String} userId
    * @param {Boolean} availability
    */
-  const changeAvailability = async (userId, availability) => {
-    return await updateUser(userId, {
+  async changeAvailability(userId, availability) {
+    return await this.updateUser(userId, {
       disabled: availability,
     })
   }
@@ -49,50 +51,62 @@ module.exports = adminInstance => {
    * @param {Object} userData
    * @returns {Object}
    */
-  const createUser = async userData => {
+  async createUser(userData) {
     let response
 
     try {
-      const authResponse = await adminAuth.createUser(userData)
+      const authResponse = await this.adminAuth.createUser(userData)
       const successMessage = 'Authentication created successfully'
-      response = baseService.getSuccessResponse({ ...authResponse }, successMessage)
+      response = this.getSuccessResponse({ ...authResponse }, successMessage)
     } catch (error) {
       const errorMessage = !error.errorInfo ? 'Error creating user auth' : error.errorInfo.message
       console.error('Error creating user auth', !error.errorInfo ? error : error.errorInfo)
-      response = baseService.getErrorResponse(errorMessage)
+      response = this.getErrorResponse(errorMessage)
     }
 
     return response
   }
 
-  const getModel = data => {
+  async createCustomToken(userId) {
+    // TODO: Move additional claims
+    const additionalClaims = {
+      alexa: true,
+    }
+    return await this.adminAuth.createCustomToken(userId, additionalClaims)
+  }
+
+  getModel(data) {
     return new UserAuthentication(data)
   }
 
-  const revokeToken = async userId => {
+  async revokeToken(userId) {
+    let response
     try {
-      await adminInstance.revokeRefreshTokens(userId)
-      const userRecord = await adminAuth.getUser(userId)
+      await this.adminAuth.revokeRefreshTokens(userId)
+      const userRecord = await this.adminAuth.getUser(userId)
       const revokeTimeStamp = new Date(userRecord.tokensValidAfterTime).getTime() / 1000
 
-      baseService.returnData.message = 'Sign out successfully'
-      baseService.returnData.data = { revokeTimeStamp }
+      const successMessage = 'Sign out successfully'
+      response = this.getSuccessResponse({ revokeTimeStamp }, successMessage)
     } catch (err) {
-      console.error('Error sign out: ', err)
-      baseService.returnData.message = 'Error sign out'
-      baseService.returnData.responseCode = 500
+      const errorMessage = 'Error revoking token'
+      /* eslint-disable no-console */
+      console.error(errorMessage, err)
+      /* eslint-enable */
+      response = this.getErrorResponse(errorMessage)
     }
 
-    return baseService.returnData
+    return response
   }
 
-  const verifyToken = async token => {
+  async verifyToken(token) {
+    let response
     let responseData = {
       verified: false,
     }
 
     try {
-      const currentToken = await adminAuth.verifyIdToken(token)
+      const currentToken = await this.adminAuth.verifyIdToken(token)
 
       if (!currentToken) {
         return {
@@ -101,25 +115,19 @@ module.exports = adminInstance => {
         }
       }
 
-      baseService.returnData.message = 'Successfully verified Token'
+      const successMessage = 'Successfully verified Token'
       responseData.verified = true
-    } catch (error) {
-      console.error('Error while verifying token id', error)
-      baseService.returnData.message = 'Error while verifying token id'
-      baseService.returnData.responseCode = 500
-    } finally {
-      baseService.returnData.data = responseData
+      response = this.getSuccessResponse(responseData, successMessage)
+    } catch (err) {
+      const errorMessage = 'Error while verifying token id'
+      /* eslint-disable no-console */
+      console.error(errorMessage, err)
+      /* eslint-enable */
+      response = this.getErrorResponse(errorMessage)
     }
 
-    return baseService.returnData
-  }
-
-  return {
-    changeAvailability,
-    changePasswordUsingAdminSDK,
-    createUser,
-    getModel,
-    revokeToken,
-    verifyToken,
+    return response
   }
 }
+
+module.exports = AuthenticationService
