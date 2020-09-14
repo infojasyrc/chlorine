@@ -1,7 +1,7 @@
 'use strict'
 
 const BaseController = require('../base.controller')
-const setupDBService = require('../../../../services')
+const setupDBService = require('../../../services')
 
 const baseController = new BaseController()
 const dbService = setupDBService()

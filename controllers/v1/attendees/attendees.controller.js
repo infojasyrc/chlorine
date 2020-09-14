@@ -1,160 +1,152 @@
-'use strict';
+'use strict'
 
-const {parse} = require('json2csv');
-const setupDBService = require('../../../../services');
-const dbService = setupDBService();
+const { parse } = require('json2csv')
+const setupDBService = require('../../../services')
+const dbService = setupDBService()
 
 const get = async (request, response) => {
   if (!request.params.id) {
     return response
       .status(200)
-      .json({status: 'OK', data: {}, message: 'Missing eventId parameter'});
+      .json({ status: 'OK', data: {}, message: 'Missing eventId parameter' })
   }
 
-  const id = request.params.id;
+  const id = request.params.id
 
   const fields = [
     {
       label: 'Nombre',
       value: 'firstName',
-      default: ''
-    }, {
+      default: '',
+    },
+    {
       label: 'Apellido',
       value: 'lastName',
-      default: ''
-    }, {
+      default: '',
+    },
+    {
       label: 'E-Mail',
       value: 'email',
-      default: ''
-    }, {
+      default: '',
+    },
+    {
       label: 'Teléfono',
       value: 'phoneNumber',
-      default: ''
-    }, {
+      default: '',
+    },
+    {
       label: 'Compañía',
       value: 'company',
-      default: ''
-    }, {
+      default: '',
+    },
+    {
       label: 'Cargo',
       value: 'position',
-      default: ''
-    }, {
+      default: '',
+    },
+    {
       label: 'Universidad',
       value: 'university',
-      default: ''
-    }, {
+      default: '',
+    },
+    {
       label: 'Java',
-      value: row => row.java ?
-        'Sí' :
-        'No',
-      default: ''
-    }, {
+      value: row => (row.java ? 'Sí' : 'No'),
+      default: '',
+    },
+    {
       label: '.Net',
-      value: row => row.dotNet ?
-        'Sí' :
-        'No',
-      default: ''
-    }, {
+      value: row => (row.dotNet ? 'Sí' : 'No'),
+      default: '',
+    },
+    {
       label: 'PHP',
-      value: row => row.php ?
-        'Sí' :
-        'No',
-      default: ''
-    }, {
+      value: row => (row.php ? 'Sí' : 'No'),
+      default: '',
+    },
+    {
       label: 'Mobile',
-      value: row => row.mobile ?
-        'Sí' :
-        'No',
-      default: ''
-    }, {
+      value: row => (row.mobile ? 'Sí' : 'No'),
+      default: '',
+    },
+    {
       label: 'Full Stack',
-      value: row => row.fullstack ?
-        'Sí' :
-        'No',
-      default: ''
-    }, {
+      value: row => (row.fullstack ? 'Sí' : 'No'),
+      default: '',
+    },
+    {
       label: 'UI',
-      value: row => row.ui ?
-        'Sí' :
-        'No',
-      default: ''
-    }, {
+      value: row => (row.ui ? 'Sí' : 'No'),
+      default: '',
+    },
+    {
       label: 'QA',
-      value: row => row.qa ?
-        'Sí' :
-        'No',
-      default: ''
-    }, {
+      value: row => (row.qa ? 'Sí' : 'No'),
+      default: '',
+    },
+    {
       label: 'Otros',
-      value: row => row.others ?
-        'Sí' :
-        'No',
-      default: ''
-    }, {
+      value: row => (row.others ? 'Sí' : 'No'),
+      default: '',
+    },
+    {
       label: 'Estudiante',
-      value: row => row.student ?
-        'Sí' :
-        'No',
-      default: ''
-    }, {
+      value: row => (row.student ? 'Sí' : 'No'),
+      default: '',
+    },
+    {
       label: 'Sin Experiencia',
-      value: row => row.noExperience ?
-        'Sí' :
-        'No',
-      default: ''
-    }, {
+      value: row => (row.noExperience ? 'Sí' : 'No'),
+      default: '',
+    },
+    {
       label: '1 a 3',
-      value: row => row.oneToThree ?
-        'Sí' :
-        'No',
-      default: ''
-    }, {
+      value: row => (row.oneToThree ? 'Sí' : 'No'),
+      default: '',
+    },
+    {
       label: '3 a 5',
-      value: row => row.threeToFive ?
-        'Sí' :
-        'No',
-      default: ''
-    }, {
+      value: row => (row.threeToFive ? 'Sí' : 'No'),
+      default: '',
+    },
+    {
       label: 'Más de 5',
-      value: row => row.moreThanFive ?
-        'Sí' :
-        'No',
-      default: ''
-    }, {
+      value: row => (row.moreThanFive ? 'Sí' : 'No'),
+      default: '',
+    },
+    {
       label: 'Scrum/Líder',
-      value: row => row.scrumLeader ?
-        'Sí' :
-        'No',
-      default: ''
-    }
-  ];
+      value: row => (row.scrumLeader ? 'Sí' : 'No'),
+      default: '',
+    },
+  ]
 
   const options = {
     fields: fields,
-    quotes: '\'',
+    quotes: '"',
     withBOM: true,
-    delimiter: ';'
-  };
+    delimiter: ';',
+  }
 
   try {
-    let eventResponse = await dbService.eventsService.findById(id);
+    let eventResponse = await dbService.eventsService.findById(id)
 
-    const event = eventResponse.data;
+    const event = eventResponse.data
 
-    const csv = parse(event.attendees, options);
+    const csv = parse(event.attendees, options)
 
-    response.set('Content-Type', 'application/octet-stream');
-    response.set('Content-disposition', `attachment;filename=${event.name}.csv`);
-    response.status(200);
-    response.send(new Buffer(csv));
+    response.set('Content-Type', 'application/octet-stream')
+    response.set('Content-disposition', `attachment;filename=${event.name}.csv`)
+    response.status(200)
+    response.send(new Buffer(csv))
   } catch (error) {
-    console.error('Error while exporting attendees', error);
+    console.error('Error while exporting attendees', error)
     response
       .status(500)
-      .json({status: 'ERROR', data: {}, message: 'Error while exporting attendees'});
+      .json({ status: 'ERROR', data: {}, message: 'Error while exporting attendees' })
   }
-};
+}
 
 module.exports = {
-  get
-};
+  get,
+}
