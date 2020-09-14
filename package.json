@@ -5,9 +5,9 @@
   "scripts": {
     "generate:keys:dev": "cp services-config/app.prod.json services-config/app.json",
     "generate:keys:test": "cp services-config/app.test.json services-config/app.json",
-    "dev": "npm run generate:keys:dev && nodemon index.js",
-    "start": "npm run generate:keys:dev && node index.js",
-    "test": "npm run generate:keys:test && nyc --reporter=lcov ava",
+    "dev": "yarn generate:keys:dev && nodemon index.js",
+    "start": "yarn generate:keys:dev && node index.js",
+    "test": "yarn generate:keys:test && nyc --reporter=lcov ava",
     "watch:test": "ava --watch",
     "lint": "npx eslint ."
   },
@@ -16,7 +16,7 @@
     "url": ""
   },
   "engines": {
-    "node": "10"
+    "node": "12"
   },
   "private": true,
   "devDependencies": {
