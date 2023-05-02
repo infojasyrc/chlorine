@@ -20,7 +20,8 @@ const checkPublicUrls = request => {
   return (
     request.path.includes('/v1/authenticate') ||
     request.path.includes('/v1/events') ||
-    request.path.includes('/v1/token')
+    request.path.includes('/v1/token') ||
+    request.path.includes('/v1/healthcheck')
   )
 }
 
