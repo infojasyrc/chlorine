@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgresDev
+      - POSTGRES_PASSWORD=Passw0rd
+      - POSTGRES_DB=Lea4n.
+    ports:
+      - '5432:5432'
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - '27017:27017'
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=mongoDev
+      - MONGO_INITDB_ROOT_PASSWORD=Passw0rd
