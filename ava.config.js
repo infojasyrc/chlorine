@@ -1,7 +1,4 @@
-export default ({projectDir}) => ({
-  babel: {
-    extensions: ['js', 'jsx']
-  },
+module.exports = {
   files: [
     'tests/**/*.spec.js',
     'tests/**/**/*.spec.js',
@@ -10,5 +7,5 @@ export default ({projectDir}) => ({
   ],
   cache: true,
   failWithoutAssertions: false,
-  verbose: true
-});
+  verbose: true,
+}
