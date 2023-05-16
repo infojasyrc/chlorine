@@ -12,30 +12,51 @@ From Firebase, we will use:
 Dependencies
 ===
 
-For this application, we are using Nodejs v10. (You will check .nvmrc file)
+For this application, we are using Nodejs v18. (You will check .nvmrc file)
 
 For MacOS:
 
-```
-- brew install nvm
-- nvm install v10
-```
-
-Local Development with reload
-===
-
-```
-- npm run dev
+```bash
+brew install nvm
+nvm install v18
 ```
 
 Local Development
 ===
 
-```
-- npm run start
+For local develpment, you should copy .env.example and use environment variables according to the env.
+
+| Key                   | Description                                                                     |
+|:----------------------|:--------------------------------------------------------------------------------|
+| **PRIVATE_KEY_ID:**     | Project Id according Firebase (**mandatory**). |
+| **PRIVATE_KEY:** | Unique identifer for Project in Firebase |
+| **CLIENT_EMAIL:**     | Email created by Firebase for GService account |
+| **CLIENT_ID:**          | Identifier for client connection |
+| **CLIENT_CERT_URL:**          | Cert URL for Google identification |
+
+Finally, use the following command to run the application
+
+```bash
+yarn start
 ```
 
-Available endpoints for local development
+If you need to reload the application on each change, use the following command
+
+```bash
+yarn dev
+```
+
+Folder structure
+===
+
+services: This folder will group all services
+models: This folder will group all models
+controllers: This folder will group all endpoints available for the application
+providers: this folder group all data providers for the application. In this case: firebase
+services-config: this folder have the api keys for firebase
+tests: this folder group all unit tests
+
+Examples of  available endpoints
 ===
 
 ```
@@ -46,13 +67,6 @@ Available endpoints for local development
 - put http://localhost:5001/api/users/:id
 - delete http://localhost:5001/api/users/:id
 ```
-
-Folder structure
-===
-
-services: This folder will group all services
-models: This folder will group all models
-api: This folder will group all functions to handle the enpoints.
 
 For Debugging
 ===
